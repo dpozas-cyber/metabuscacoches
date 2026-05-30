@@ -536,7 +536,7 @@ async function buscarResultados(){
       img:item.images?.[0]||item.imageUrl||null,
     }))).catch(e=>addLog(`❌ AutoScout24: ${e.message}`));
 
-  const wpP=runActor("autoclient~wallapop-spain-scraper",{startUrls:[{url:wpUrl}],maxItems:20})
+  const wpP=runActor("autoclient~wallapop-spain-scraper",{tart_urls:[{url:wpUrl}],max_items:20})
     .then(items=>items.slice(0,20).forEach(item=>todos.push({
       titulo:item.title||item.name||"Sin título",
       precio:item.price||item.salePrice||0, km:item.km||item.mileage||0,
