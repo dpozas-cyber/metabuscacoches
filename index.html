@@ -583,7 +583,7 @@ async function buscarResultados(){
       img:item.image||item.images?.[0]||null,
     }))).catch(e=>addLog(`❌ Coches.net: ${e.message}`));
 
-  await Promise.allSettled([mnP, asP, wpP, cnP]);
+  await Promise.allSettled([asP,wpP,cnP]);
   state.resultados=todos;
   if(todos.length===0){
     document.getElementById('res-error').style.display='block';
