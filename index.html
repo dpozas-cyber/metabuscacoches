@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metabuscador de coches</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f7f9fc;min-height:100vh;color:#1a202c}
+  .wrap{max-width:680px;margin:0 auto;padding:1.5rem 1rem}
+  h1{font-size:19px;font-weight:700;color:#1a202c}
+  p.sub{font-size:12px;color:#718096;margin-top:2px}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#1a6fb5,#2980b9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+  .tab{padding:8px 14px;border-radius:8px;border:none;background:#e2e8f0;color:#4a5568;font-weight:400;cursor:pointer;font-size:13px}
+  .tab.active{background:#1a6fb5;color:#fff;font-weight:600}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+  .card h2{font-size:14px;font-weight:700;margin-bottom:12px}
+  label{font-size:12px;color:#718096;display:block;margin-bottom:4px;font-weight:500}
+  input,select{padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1a202c;font-size:14px;width:100%}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .span2{grid-column:span 2}
+  .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#1a6fb5,#2980b9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(26,111,181,0.35)}
+  .btn-outline{width:100%;padding:11px;background:transparent;color:#1a6fb5;border:2px solid #1a6fb5;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-purple{width:100%;padding:11px;background:linear-gradient(135deg,#6b46c1,#805ad5);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-green{width:100%;padding:11px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-small{padding:5px 12px;border-radius:20px;border:2px solid #e2e8f0;background:transparent;color:#718096;cursor:pointer;font-size:12px;font-weight:500}
+  .btn-small.active{color:#fff}
+  .portal-link{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:10px;background:#fff;margin-bottom:8px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .portal-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+  .badge{font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600}
+  .badge-green{background:#c6f6d5;color:#276749}
+  .badge-blue{background:#ebf4ff;color:#2b6cb0;border:1px solid #bee3f8}
+  .result-card{display:flex;align-items:stretch;border-radius:10px;border:1px solid #e2e8f0;background:#fff;margin-bottom:8px;text-decoration:none;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .result-img{width:110px;min-height:85px;object-fit:cover;flex-shrink:0}
+  .result-body{flex:1;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+  .result-price{font-size:18px;font-weight:700;color:#2c5282;text-align:right;flex-shrink:0}
+  .log-box{background:#1a202c;border-radius:10px;padding:12px;margin-top:12px}
+  .log-box p{margin:2px 0;font-size:11px;color:#e2e8f0;font-family:monospace;line-height:1.4}
+  .info-box{border-radius:10px;padding:12px;margin-bottom:14px}
+  .info-blue{background:#ebf4ff;border:1px solid #bee3f8}
+  .info-yellow{background:#fffbeb;border:1px solid #fbd38d}
+  .empty{text-align:center;padding:3rem 0;color:#a0aec0}
+  .empty .icon{font-size:40px;margin-bottom:8px}
+  .cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 6px}
+  .portales-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .hidden{display:none}
+  @media(max-width:500px){.grid2,.grid3{grid-template-columns:1fr}.span2{grid-column:span 1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">🔍</div>
+    <div>
+      <h1>Metabuscador de coches</h1>
+      <p class="sub">12 portales · segunda mano + ex-renting</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('filtros')">⚙️ Filtros</button>
+    <button class="tab" onclick="showTab('portales')">🔗 Portales</button>
+    <button class="tab" onclick="showTab('resultados')">📋 Resultados</button>
+    <button class="tab" onclick="showTab('historial')">🕐 Historial</button>
+  </div>
+
+  <!-- FILTROS -->
+  <div id="tab-filtros">
+    <div class="card">
+      <h2>Portales activos <span id="portales-count" style="font-weight:400;font-size:12px;color:#718096"></span></h2>
+      <div id="portales-selector"></div>
+    </div>
+    <div class="card">
+      <h2>Vehículo</h2>
+      <div class="grid2">
+        <div><label>Buscar marca</label><input id="filtro-marca" placeholder="Escribe para filtrar..." oninput="renderMarcas()"></div>
+        <div><label>Marca</label><select id="sel-marca" onchange="onMarcaChange()"></select></div>
+        <div class="span2"><label id="lbl-modelo">Modelo</label><select id="sel-modelo" disabled></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Precio (€)</h2>
+      <div class="grid2">
+        <div><label>Desde</label><input type="number" id="precio-min" placeholder="0"></div>
+        <div><label>Hasta</label><input type="number" id="precio-max" placeholder="20.000"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Año y kilometraje</h2>
+      <div class="grid3">
+        <div><label>Año desde</label><input type="number" id="anyo-min" placeholder="2015"></div>
+        <div><label>Año hasta</label><input type="number" id="anyo-max" placeholder="2024"></div>
+        <div><label>Km máximos</label><input type="number" id="km-max" placeholder="100.000"></div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="preparar()">🔍 Preparar búsqueda</button>
+  </div>
+
+  <!-- PORTALES -->
+  <div id="tab-portales" class="hidden">
+    <div class="info-box info-blue" id="resumen-filtros"></div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap" id="cat-filters"></div>
+    <button class="btn-purple" style="margin-bottom:12px" onclick="contarResultados()">🔢 Contar resultados en cada portal</button>
+    <div id="portales-lista"></div>
+    <button class="btn-outline" style="margin:4px 0 16px" onclick="abrirTodos()">🚀 Abrir todos los portales a la vez</button>
+    <div class="card">
+      <h2 style="margin-bottom:10px">📲 Resumen para WhatsApp</h2>
+      <button class="btn-green" onclick="generarResumen()">✨ Generar resumen con IA</button>
+      <div id="resumen-wa" style="display:none;margin-top:10px">
+        <div id="resumen-texto" style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:12px;font-size:13px;line-height:1.7;white-space:pre-wrap;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;padding:10px;background:transparent;color:#718096;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;cursor:pointer" onclick="document.getElementById('resumen-wa').style.display='none'">🔄 Regenerar</button>
+          <button style="flex:2;padding:10px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer" onclick="enviarWA()">📱 Enviar por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="tab-resultados" class="hidden">
+    <div class="info-box info-yellow">
+      <p style="font-weight:700;font-size:13px;color:#744210;margin-bottom:4px">⚡ Resultados en tiempo real via Apify</p>
+      <p style="font-size:12px;color:#92400e;line-height:1.5">Scraping real de AutoScout24, Wallapop y Coches.net. Puede tardar 30–90 segundos.</p>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+      <button class="btn-purple" style="flex:1;min-width:160px" onclick="buscarResultados()">🔎 Buscar resultados</button>
+      <select id="orden-res" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;font-size:14px" onchange="renderResultados()">
+        <option value="precio_asc">💰 Precio: menor primero</option>
+        <option value="precio_desc">💰 Precio: mayor primero</option>
+        <option value="km_asc">🛣️ Menos kilómetros</option>
+        <option value="año_desc">📅 Más nuevos primero</option>
+      </select>
+    </div>
+    <div id="res-error" style="display:none" class="card" style="background:#fff5f5;border:1px solid #fed7d7;color:#c53030;font-size:13px"></div>
+    <div id="res-empty" class="empty">
+      <div class="icon">📋</div>
+      <p style="font-weight:600;color:#718096">Pulsa "Buscar resultados" para empezar</p>
+      <p style="font-size:12px;margin-top:4px">AutoScout24 + Wallapop + Coches.net</p>
+    </div>
+    <div id="res-lista"></div>
+    <div id="log-box" class="log-box hidden"><p style="font-weight:700;color:#68d391;margin-bottom:8px">🔧 Log</p><div id="log-lines"></div></div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="tab-historial" class="hidden">
+    <div id="historial-lista"></div>
+    <button onclick="limpiarHistorial()" style="width:100%;padding:10px;background:transparent;color:#e53e3e;border:1px solid #fed7d7;border-radius:9px;font-size:13px;cursor:pointer;margin-top:4px;display:none" id="btn-limpiar">🗑️ Limpiar historial</button>
+  </div>
+</div>
+
+<script>
+const PROXY = "https://metabuscador.dpozas.workers.dev";
+const APIFY_TOKEN = "apify_api_VlWXqpSHbdQB2ZsPtTiF2noc4T0YvV0JQcbQ";
+const ANTHROPIC_KEY = ""; // Añade tu API key de Anthropic aquí si quieres el resumen IA
+
+const MM = {
+  "Cualquiera":[],
+  "Alfa Romeo":["Giulia","Giulia Quadrifoglio","Giulietta","Stelvio","Stelvio Quadrifoglio","Tonale","147","156","159","Mito","GTV","Spider"],
+  "Audi":["A1","A3","A3 Sportback","A4","A4 Avant","A5","A5 Sportback","A6","A6 Avant","A7","A8","Q2","Q3","Q3 Sportback","Q4 e-tron","Q5","Q5 Sportback","Q7","Q8","R8","RS3","RS4","RS5","RS6","RS7","S3","S4","S5","S6","TT","TT RS","E-tron","E-tron GT"],
+  "BMW":["116i","118i","118d","120i","120d","125i","M135i","M140i","220i","220d","M240i","320i","320d","330i","330d","330e","340i","M340i","M3","M3 Competition","420i","420d","430i","440i","M4","M4 Competition","520i","520d","530i","530d","530e","540i","M5","M5 Competition","730d","740i","M8","X1","X2","X3","X3 M","X4","X4 M","X5","X5 M","X6","X6 M","X7","Z4","i3","i4","i5","i7","iX","iX1","iX2","iX3"],
+  "Citroën":["C1","C2","C3","C3 Aircross","C4","C4 Cactus","C5","C5 Aircross","C5 X","Berlingo","C4 Picasso","Grand C4 Picasso"],
+  "Cupra":["Ateca","Born","Formentor","Leon","Tavascan"],
+  "Dacia":["Duster","Jogger","Logan","Sandero","Sandero Stepway","Spring"],
+  "DS":["DS3 Crossback","DS4","DS5","DS7 Crossback","DS9"],
+  "Fiat":["500","500C","500e","500L","500X","Doblo","Grande Punto","Panda","Panda 4x4","Panda Hybrid","Punto","Tipo","Tipo SW"],
+  "Ford":["Fiesta","Fiesta ST","Focus","Focus ST","Focus RS","Kuga","Kuga PHEV","Mondeo","Mustang","Mustang Mach-E","Puma","Puma ST","Ranger","S-Max","Galaxy","EcoSport","Transit Custom"],
+  "Honda":["Civic","Civic Type R","CR-V","HR-V","Jazz","e","ZR-V"],
+  "Hyundai":["i10","i20","i20 N","i30","i30 N","i30 Fastback","Ioniq 5","Ioniq 6","Kona","Kona Electric","Santa Fe","Tucson","Tucson PHEV","ix35"],
+  "Jaguar":["E-Pace","F-Pace","F-Type","I-Pace","XE","XF","XJ"],
+  "Jeep":["Cherokee","Compass","Grand Cherokee","Renegade","Wrangler"],
+  "Kia":["Ceed","Ceed GT","EV6","EV6 GT","EV9","Niro","Niro EV","Picanto","Sportage","Sportage PHEV","Stinger","Xceed"],
+  "Lamborghini":["Aventador","Huracán","Urus","Revuelto"],
+  "Land Rover":["Defender 90","Defender 110","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],
+  "Lexus":["CT 200h","IS 300h","NX 300h","NX 350h","RX 450h","UX 250h","LC 500"],
+  "Maserati":["Ghibli","GranTurismo","Grecale","Levante","MC20","Quattroporte"],
+  "Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","MX-5","MX-30","RX-8"],
+  "McLaren":["570S","600LT","720S","750S","Artura","GT"],
+  "Mercedes":["A 180","A 200","A 220","A 35 AMG","A 45 AMG","AMG GT","C 180","C 200","C 220 d","C 300","C 43 AMG","C 63 AMG","C 63 S AMG","CLA 200","CLA 220 d","CLA 35 AMG","CLS 350","E 200","E 220 d","E 300","E 43 AMG","E 63 AMG","EQA 250","EQC 400","EQE 350","EQS 450","G 500","G 63 AMG","GLA 200","GLC 200","GLC 220 d","GLC 300","GLC 43 AMG","GLC 63 AMG","GLE 300 d","GLE 350","GLE 53 AMG","GLS 400 d","S 400","S 500","S 580","S 63 AMG","V 220 d","V 300 d"],
+  "MG":["3","4","5","HS","HS PHEV","ZS","ZS EV"],
+  "Mini":["Cooper","Cooper S","Cooper SE","Cabrio","Clubman","Countryman","JCW","One"],
+  "Mitsubishi":["ASX","Eclipse Cross","L200","Outlander","Outlander PHEV","Pajero"],
+  "Nissan":["350Z","370Z","GT-R","Juke","Leaf","Micra","Navara","Qashqai","X-Trail","Ariya"],
+  "Opel":["Astra","Astra Electric","Corsa","Corsa-e","Crossland","Grandland","Insignia","Mokka","Mokka-e","Zafira"],
+  "Peugeot":["108","208","208 e","2008","2008 e","308","308 GTi","3008","3008 Hybrid","408","408 PHEV","508","508 PHEV","5008","RCZ"],
+  "Porsche":["718 Boxster","718 Cayman","718 Cayman GT4","911 Carrera","911 Carrera S","911 GT3","911 GT3 RS","911 Turbo","911 Turbo S","Cayenne","Macan","Macan S","Macan Turbo","Macan EV","Panamera","Taycan"],
+  "Renault":["Captur","Clio","Clio E-Tech","Clio RS","Espace","Kadjar","Kangoo","Megane","Megane RS","Megane E-Tech","Scenic","Twingo","Zoe","Arkana","Austral"],
+  "Seat":["Arona","Ateca","Ibiza","Ibiza FR","Leon","Leon FR","Leon Cupra","Mii","Tarraco"],
+  "Skoda":["Citigo","Enyaq iV 80","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Octavia RS","Rapid","Scala","Superb","Yeti"],
+  "Smart":["#1","#3","EQ ForTwo","ForTwo"],
+  "Subaru":["BRZ","Forester","Impreza","Levorg","Outback","WRX STI","XV"],
+  "Suzuki":["Baleno","Grand Vitara","Ignis","Jimny","S-Cross","Swift","Swift Sport","Vitara"],
+  "Tesla":["Model 3","Model 3 Long Range","Model 3 Performance","Model S","Model S Plaid","Model X","Model Y","Model Y Long Range","Cybertruck"],
+  "Toyota":["Aygo","Aygo X","bZ4X","C-HR","C-HR Hybrid","Corolla","Corolla GR","GR86","GR Supra","GR Yaris","Hilux","Land Cruiser","Prius","RAV4","RAV4 Hybrid","RAV4 PHEV","Yaris","Yaris Cross","Yaris GR"],
+  "Volkswagen":["Arteon","Golf","Golf GTI","Golf GTD","Golf GTE","Golf R","Golf Variant","ID.3","ID.4","ID.4 GTX","ID.5","ID.7","Passat","Passat GTE","Passat Variant","Polo","Polo GTI","Scirocco","T-Cross","T-Roc","T-Roc R","Tiguan","Tiguan R","Touareg","Touran","Up"],
+  "Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"],
+};
+const MARCAS = Object.keys(MM);
+
+const MARCA_IDS = {"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
+const MODELO_IDS = {"Audi":{"A1":"1","A3":"345","A4":"2","A5":"3","A6":"4","Q2":"347","Q3":"348","Q5":"349","Q7":"350","Q8":"351","R8":"352","RS3":"353","RS4":"354","RS5":"355","RS6":"356","TT":"358"},"BMW":{"Serie 1":"6","Serie 3":"7","Serie 5":"8","X1":"363","X3":"365","X5":"367","X6":"368","Z4":"370","i3":"371","i4":"372","M3":"375","M4":"376","M5":"377"},"Mercedes":{"Clase A":"10","Clase B":"11","Clase C":"12","Clase E":"13","Clase S":"14","CLA":"15","GLA":"16","GLC":"17","GLE":"18","GLS":"19"},"Volkswagen":{"Golf":"378","Polo":"379","Passat":"380","Tiguan":"381","T-Roc":"382","ID.3":"383","ID.4":"384","ID.5":"385","Touareg":"386","Touran":"387"},"Seat":{"Ibiza":"389","Leon":"390","Arona":"391","Ateca":"392","Tarraco":"393"},"Renault":{"Clio":"402","Megane":"403","Captur":"404","Zoe":"408","Twingo":"409"},"Peugeot":{"208":"410","308":"411","2008":"412","3008":"413","5008":"414","508":"415"},"Toyota":{"Yaris":"422","Corolla":"423","RAV4":"424","C-HR":"425","Prius":"426"},"Ford":{"Fiesta":"433","Focus":"434","Kuga":"435","Puma":"436","Mustang":"437"},"Opel":{"Corsa":"439","Astra":"440","Mokka":"441","Grandland":"443","Insignia":"444"},"Hyundai":{"i10":"445","i20":"446","i30":"447","Tucson":"448","Santa Fe":"449","Kona":"450","Ioniq 5":"451"},"Kia":{"Picanto":"452","Ceed":"453","Sportage":"454","EV6":"456","Niro":"457"},"Fiat":{"500":"458","Panda":"459","Tipo":"460","500X":"461"},"Mazda":{"2":"463","3":"464","6":"465","CX-5":"466","CX-30":"467","MX-5":"468"},"Nissan":{"Micra":"469","Juke":"470","Qashqai":"471","X-Trail":"472","Leaf":"473"},"Dacia":{"Sandero":"479","Duster":"480","Logan":"481","Jogger":"482","Spring":"483"},"Mini":{"Cooper":"484","Countryman":"485","Clubman":"486"},"Volvo":{"XC40":"496","XC60":"497","XC90":"498","V60":"499","V90":"500","S60":"501"},"Tesla":{"Model 3":"502","Model S":"503","Model X":"504","Model Y":"505"},"Porsche":{"911 Carrera":"506","Cayenne":"507","Macan":"508","Panamera":"509","Taycan":"510"}};
+const MOTOR_IDS = {"Alfa Romeo":"1","Audi":"6","BMW":"7","Citroën":"10","Cupra":"77","Dacia":"71","DS":"76","Fiat":"15","Ford":"16","Honda":"19","Hyundai":"20","Jaguar":"22","Jeep":"23","Kia":"25","Lamborghini":"27","Land Rover":"28","Lexus":"29","Maserati":"33","Mazda":"34","McLaren":"74","Mercedes":"35","MG":"73","Mini":"38","Mitsubishi":"37","Nissan":"40","Opel":"41","Peugeot":"42","Porsche":"45","Renault":"48","Seat":"52","Skoda":"53","Smart":"54","Subaru":"57","Suzuki":"58","Tesla":"69","Toyota":"59","Volkswagen":"64","Volvo":"65"};
+
+const CAT_COLORS = {portal:"#1a6fb5",clasificados:"#e67e22",dealer:"#8e44ad",renting:"#1abc9c"};
+const ALL_PORTALES = [
+  {id:"autoscout",   name:"AutoScout24",     color:"#f47920", cat:"portal",       filtros:true},
+  {id:"milanuncios", name:"Milanuncios",      color:"#e67e22", cat:"clasificados", filtros:true},
+  {id:"cochesnet",   name:"Coches.net",       color:"#1a6fb5", cat:"portal",       filtros:true},
+  {id:"autocasion",  name:"Autocasión",       color:"#c0392b", cat:"portal",       filtros:true},
+  {id:"cochescom",   name:"Coches.com",       color:"#27ae60", cat:"portal",       filtros:true},
+  {id:"flexicar",    name:"Flexicar",         color:"#2471a3", cat:"dealer",       filtros:true},
+  {id:"ocasionplus", name:"OcasionPlus",      color:"#8e44ad", cat:"dealer",       filtros:false},
+  {id:"wallapop",    name:"Wallapop",         color:"#13c1ac", cat:"clasificados", filtros:true},
+  {id:"motor",       name:"Motor.es",         color:"#16a085", cat:"portal",       filtros:true},
+  {id:"ayvens",      name:"Ayvens Ocasión",   color:"#1abc9c", cat:"renting",      filtros:false},
+  {id:"arval",       name:"Arval AutoSelect", color:"#e74c3c", cat:"renting",      filtros:false},
+  {id:"athlon",      name:"Athlon Ocasión",   color:"#f39c12", cat:"renting",      filtros:false},
+];
+
+// Estado
+let state = {
+  activos: ALL_PORTALES.map(p=>p.id),
+  marca: "Cualquiera", modelo: "",
+  precioMin:"", precioMax:"", anyoMin:"", anyoMax:"", kmMax:"",
+  urls: {},
+  historial: [],
+  resultados: [],
+  conteos: {},
+  catFiltro: "all",
+  resumen: ""
+};
+
+const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const qs = o => { const s=o.toString(); return s?"?"+s:""; };
+
+function buildUrls() {
+  const m = state.marca==="Cualquiera"?"":state.marca;
+  const mo = state.modelo||"";
+  const pMin=state.precioMin, pMax=state.precioMax;
+  const aMin=state.anyoMin, aMax=state.anyoMax, km=state.kmMax;
+  const mSlug=m?slug(m):"", moSlug=mo?slug(mo):"";
+  const mId=m?MARCA_IDS[m]||"":"";
+  const moId=m&&mo?MODELO_IDS[m]?.[mo]||"":"";
+  const mtMId=m?MOTOR_IDS[m]||"":"";
+
+  const as=new URLSearchParams({atype:"C",ustate:"N,U",cy:"E",desc:"0",sort:"standard"});
+  if(pMin)as.set("pricefrom",pMin); if(pMax)as.set("priceto",pMax);
+  if(aMin)as.set("fregfrom",aMin); if(aMax)as.set("fregto",aMax);
+  if(km)as.set("kmto",km);
+  const asUrl=`https://www.autoscout24.es${m?`/lst/${mSlug}${moSlug?"/"+moSlug:""}`:"/lst"}?${as}`;
+
+  const mn=new URLSearchParams({demanda:"n",orden:"relevance",fromSearch:"1",hitOrigin:"listing"});
+  if(mId)mn.set("marca",mId); if(moId)mn.set("modelo",moId);
+  if(pMin)mn.set("desde",pMin); if(pMax)mn.set("hasta",pMax);
+  if(aMin)mn.set("anod",aMin); if(aMax)mn.set("anoh",aMax);
+  if(km)mn.set("kilometersTo",km);
+  const mnUrl=`https://www.milanuncios.com/coches-de-segunda-mano/${qs(mn)}`;
+
+  const cn=new URLSearchParams();
+  if(mId)cn.set("MakeIds[0]",mId); if(moId)cn.set("ModelIds[0]",moId);
+  if(pMin)cn.set("MinPrice",pMin); if(pMax)cn.set("MaxPrice",pMax);
+  if(aMin)cn.set("MinYear",aMin); if(aMax)cn.set("MaxYear",aMax);
+  if(km)cn.set("MaxKms",km);
+  const cnUrl=`https://www.coches.net/search/${qs(cn)}`;
+
+  const acBase=m?(mSlug+(moSlug?"-"+moSlug:"")+"-ocasion"):"";
+  let acF="";
+  if(aMin)acF+=`/fecha-desde-${aMin}`; if(aMax)acF+=`/fecha-hasta-${aMax}`;
+  if(pMin)acF+=`/precio-desde-${pMin}`; if(pMax)acF+=`/precio-hasta-${pMax}`;
+  if(km)acF+=`/km-hasta-${km}`;
+  const acUrl=`https://www.autocasion.com/coches-segunda-mano/${acBase||""}${acF}`;
+
+  const cc=new URLSearchParams();
+  if(pMin)cc.set("precio_desde",pMin); if(pMax)cc.set("precio_hasta",pMax);
+  if(aMin)cc.set("anyo_desde",aMin); if(aMax)cc.set("anyo_hasta",aMax);
+  if(km)cc.set("km_hasta",km);
+  const ccUrl=m?`https://www.coches.com/coches-segunda-mano/${mSlug}${moSlug?"-"+moSlug:""}.htm${qs(cc)}`:`https://www.coches.com/coches-segunda-mano/${qs(cc)}`;
+
+  const fx=new URLSearchParams();
+  if(m)fx.set("brands",mSlug); if(mo)fx.set("models",moSlug);
+  if(pMin)fx.set("priceFrom",pMin); if(pMax)fx.set("priceTo",pMax);
+  if(aMin)fx.set("yearFrom",aMin); if(aMax)fx.set("yearTo",aMax);
+  if(km)fx.set("kmTo",km);
+  const fxUrl=`https://www.flexicar.es/coches-segunda-mano/search/${qs(fx)}`;
+
+  const wp=new URLSearchParams({category_id:"100",order_by:"most_relevance"});
+  if(m)wp.set("brand",m); if(mo)wp.set("model",mo);
+  if(pMin)wp.set("min_sale_price",pMin); if(pMax)wp.set("max_sale_price",pMax);
+  if(km)wp.set("max_km",km); if(aMin)wp.set("min_year",aMin); if(aMax)wp.set("max_year",aMax);
+  const wpUrl=`https://es.wallapop.com/search${qs(wp)}`;
+
+  const mt=new URLSearchParams();
+  if(mtMId)mt.set("marca",mtMId);
+  if(pMin)mt.set("precio_min",pMin); if(pMax)mt.set("precio_max",pMax);
+  if(aMin)mt.set("matriculacion_min",aMin); if(aMax)mt.set("matriculacion_max",aMax);
+  if(km)mt.set("km_max",km);
+  const mtUrl=`https://www.motor.es/segunda-mano/coches/${qs(mt)}`;
+
+  return {
+    autoscout:asUrl, milanuncios:mnUrl, cochesnet:cnUrl, autocasion:acUrl,
+    cochescom:ccUrl, flexicar:fxUrl, ocasionplus:"https://www.ocasionplus.com/coches-segunda-mano",
+    wallapop:wpUrl, motor:mtUrl,
+    ayvens:"https://used-cars.ayvens.com/es-es/catalog",
+    arval:"https://autoselect.arval.es/coches-segunda-mano-ocasion",
+    athlon:"https://www.athlon.com/es/vehiculos-de-ocasion/venta-a-particular/",
+  };
+}
+
+// TABS
+function showTab(id) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('tab-'+id).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// MARCAS
+function renderMarcas() {
+  const filtro = document.getElementById('filtro-marca').value.toLowerCase();
+  const sel = document.getElementById('sel-marca');
+  const current = sel.value;
+  sel.innerHTML = '';
+  MARCAS.filter(m=>m==="Cualquiera"||m.toLowerCase().includes(filtro)).forEach(m=>{
+    const o=document.createElement('option');
+    o.value=o.textContent=m;
+    if(m===current)o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function onMarcaChange() {
+  const marca = document.getElementById('sel-marca').value;
+  const sel = document.getElementById('sel-modelo');
+  const modelos = MM[marca]||[];
+  sel.innerHTML='<option value="">Cualquiera</option>';
+  modelos.forEach(m=>{const o=document.createElement('option');o.value=o.textContent=m;sel.appendChild(o);});
+  sel.disabled = marca==="Cualquiera";
+  document.getElementById('lbl-modelo').textContent=`Modelo${marca!=="Cualquiera"?` (${modelos.length} modelos)`:''}`;
+}
+
+// PORTALES SELECTOR
+function renderPortalesSelector() {
+  const wrap = document.getElementById('portales-selector');
+  wrap.innerHTML='';
+  const cats = ['portal','clasificados','dealer','renting'];
+  const labels = {portal:'Portales',clasificados:'Clasificados',dealer:'Dealers',renting:'Renting'};
+  cats.forEach(cat=>{
+    const portales = ALL_PORTALES.filter(p=>p.cat===cat);
+    const div=document.createElement('div');
+    div.innerHTML=`<p class="cat-label" style="color:${CAT_COLORS[cat]}">${labels[cat]}</p>`;
+    const btns=document.createElement('div');
+    btns.className='portales-wrap';
+    portales.forEach(p=>{
+      const b=document.createElement('button');
+      b.className='btn-small'+(state.activos.includes(p.id)?' active':'');
+      b.style.borderColor=state.activos.includes(p.id)?p.color:'#e2e8f0';
+      b.style.background=state.activos.includes(p.id)?p.color:'transparent';
+      b.style.color=state.activos.includes(p.id)?'#fff':'#718096';
+      b.textContent=(state.activos.includes(p.id)?'✓ ':'')+p.name;
+      b.onclick=()=>{
+        if(state.activos.includes(p.id))state.activos=state.activos.filter(x=>x!==p.id);
+        else state.activos.push(p.id);
+        renderPortalesSelector();
+        document.getElementById('portales-count').textContent=`(${state.activos.length}/${ALL_PORTALES.length})`;
+      };
+      btns.appendChild(b);
+    });
+    div.appendChild(btns);
+    wrap.appendChild(div);
+  });
+  document.getElementById('portales-count').textContent=`(${state.activos.length}/${ALL_PORTALES.length})`;
+}
+
+// PREPARAR
+function preparar() {
+  state.marca=document.getElementById('sel-marca').value;
+  state.modelo=document.getElementById('sel-modelo').value;
+  state.precioMin=document.getElementById('precio-min').value;
+  state.precioMax=document.getElementById('precio-max').value;
+  state.anyoMin=document.getElementById('anyo-min').value;
+  state.anyoMax=document.getElementById('anyo-max').value;
+  state.kmMax=document.getElementById('km-max').value;
+  state.urls=buildUrls();
+  state.conteos={};
+  state.resultados=[];
+  state.historial.unshift({
+    fecha:new Date().toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}),
+    marca:state.marca, modelo:state.modelo, precioMin:state.precioMin, precioMax:state.precioMax,
+    anyoMin:state.anyoMin, anyoMax:state.anyoMax, kmMax:state.kmMax,
+    activos:[...state.activos], urls:{...state.urls}
+  });
+  if(state.historial.length>20)state.historial=state.historial.slice(0,20);
+  renderPortalesLista();
+  renderResumenFiltros();
+  renderCatFilters();
+  renderHistorial();
+  // Ir a portales
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('tab-portales').classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach((b,i)=>{b.classList.remove('active');if(i===1)b.classList.add('active');});
+}
+
+function renderResumenFiltros() {
+  const m=state.marca!=="Cualquiera"?state.marca:"Cualquier marca";
+  const mo=state.modelo?` · ${state.modelo}`:"";
+  let filtros="";
+  if(state.precioMin||state.precioMax)filtros+=`${state.precioMin?parseInt(state.precioMin).toLocaleString("es")+"–":""}${state.precioMax?parseInt(state.precioMax).toLocaleString("es"):"∞"}€  `;
+  if(state.anyoMin||state.anyoMax)filtros+=`${state.anyoMin||"?"}–${state.anyoMax||"?"}  `;
+  if(state.kmMax)filtros+=`hasta ${parseInt(state.kmMax).toLocaleString("es")} km`;
+  document.getElementById('resumen-filtros').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <p style="font-weight:700;font-size:14px;color:#2c5282;margin-bottom:2px">${m}${mo}</p>
+        <p style="font-size:12px;color:#4a5568">${filtros||"Sin filtros adicionales"}</p>
+      </div>
+      <button onclick="document.querySelectorAll('[id^=tab-]').forEach(e=>e.classList.add('hidden'));document.getElementById('tab-filtros').classList.remove('hidden');document.querySelectorAll('.tab').forEach((b,i)=>{b.classList.remove('active');if(i===0)b.classList.add('active');})" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #bee3f8;background:#fff;color:#2c5282;cursor:pointer">✏️ Editar</button>
+    </div>`;
+}
+
+function renderCatFilters() {
+  const wrap=document.getElementById('cat-filters');
+  wrap.innerHTML='';
+  const cats=[{id:"all",label:"Todos"},...["portal","clasificados","dealer","renting"].map(c=>({id:c,label:{portal:"Portales",clasificados:"Clasificados",dealer:"Dealers",renting:"Renting"}[c]}))];
+  cats.forEach(c=>{
+    const cnt=ALL_PORTALES.filter(p=>state.activos.includes(p.id)&&(c.id==="all"||p.cat===c.id)).length;
+    const b=document.createElement('button');
+    b.className='btn-small'+(state.catFiltro===c.id?' active':'');
+    b.style.borderColor=state.catFiltro===c.id?'#1a6fb5':'#e2e8f0';
+    b.style.background=state.catFiltro===c.id?'#1a6fb5':'transparent';
+    b.style.color=state.catFiltro===c.id?'#fff':'#718096';
+    b.innerHTML=`${c.label} <span style="opacity:0.7">(${cnt})</span>`;
+    b.onclick=()=>{state.catFiltro=c.id;renderCatFilters();renderPortalesLista();};
+    wrap.appendChild(b);
+  });
+}
+
+function renderPortalesLista() {
+  const wrap=document.getElementById('portales-lista');
+  wrap.innerHTML='';
+  const visibles=ALL_PORTALES.filter(p=>state.activos.includes(p.id)&&(state.catFiltro==="all"||p.cat===state.catFiltro));
+  visibles.forEach(p=>{
+    const url=state.urls[p.id]||'#';
+    const conteo=state.conteos[p.id];
+    const a=document.createElement('a');
+    a.href=url; a.target="_blank"; a.className="portal-link";
+    a.style.border=`1px solid ${p.color}44`;
+    a.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="portal-icon" style="background:${p.color}">🔗</div>
+        <div style="min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-weight:600;font-size:14px;color:#1a202c">${p.name}</span>
+            <span class="badge" style="background:${CAT_COLORS[p.cat]}22;color:${CAT_COLORS[p.cat]}">${p.cat}</span>
+            ${p.filtros?'<span class="badge badge-green">filtros ✓</span>':''}
+            ${conteo?`<span class="badge badge-blue">${conteo.label}</span>`:''}
+          </div>
+          <p style="margin:0;font-size:10px;color:#a0aec0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px">${url}</p>
+        </div>
+      </div>
+      <span style="font-size:12px;padding:4px 12px;border-radius:6px;background:${p.color};color:#fff;flex-shrink:0;margin-left:8px;font-weight:500">Abrir</span>`;
+    wrap.appendChild(a);
+  });
+}
+
+function abrirTodos() {
+  const visibles=ALL_PORTALES.filter(p=>state.activos.includes(p.id)&&(state.catFiltro==="all"||p.cat===state.catFiltro));
+  visibles.forEach((p,i)=>setTimeout(()=>window.open(state.urls[p.id]||'#','_blank'),i*250));
+}
+
+// CONTAR RESULTADOS
+async function contarResultados() {
+  const btn=event.target; btn.textContent="⏳ Contando..."; btn.disabled=true;
+  const portales=ALL_PORTALES.filter(p=>state.activos.includes(p.id)&&!["ayvens","arval","athlon"].includes(p.id));
+  const pats={
+    autoscout:[/(\d[\d.,]+)\s*(?:Anuncios|anuncios|Resultados)/i],
+    milanuncios:[/(\d[\d.,]+)\s*anuncios?/i,/"numFound":(\d+)/],
+    cochesnet:[/(\d[\d.,]+)\s*(?:coches?|vehículos?|resultados?)/i,/"totalResults":(\d+)/],
+    autocasion:[/(\d[\d.,]+)\s*(?:coches?|vehículos?)/i],
+    cochescom:[/(\d[\d.,]+)\s*(?:coches?|vehículos?)/i],
+    flexicar:[/(\d[\d.,]+)\s*(?:coches?|vehículos?)/i],
+    wallapop:[/"totalElements":(\d+)/,/(\d[\d.,]+)\s*(?:coches?|resultados?)/i],
+    motor:[/(\d[\d.,]+)\s*(?:coches?|vehículos?)/i],
+  };
+  await Promise.allSettled(portales.map(async p=>{
+    try{
+      const r=await fetch(`${PROXY}/https://`+state.urls[p.id].replace(/^https?:\/\//,""));
+      const html=await r.text();
+      for(const pat of(pats[p.id]||[])){
+        const m=html.match(pat);
+        if(m){const n=parseInt(m[1].replace(/[.,]/g,""));if(!isNaN(n)&&n>0){state.conteos[p.id]={count:n,label:n.toLocaleString("es")+" resultados"};break;}}
+      }
+      if(!state.conteos[p.id])state.conteos[p.id]={count:0,label:"sin datos"};
+    }catch(e){state.conteos[p.id]={count:0,label:"error"};}
+  }));
+  renderPortalesLista();
+  btn.textContent="🔢 Actualizar conteo"; btn.disabled=false;
+}
+
+// BUSCAR RESULTADOS CON APIFY
+const logs=[];
+function addLog(msg){
+  logs.push(`${new Date().toLocaleTimeString()}: ${msg}`);
+  const box=document.getElementById('log-box');
+  box.classList.remove('hidden');
+  document.getElementById('log-lines').innerHTML=logs.map(l=>`<p>${l}</p>`).join('');
+}
+
+async function runActor(actorId, input){
+  addLog(`🚀 Lanzando ${actorId}...`);
+  const res=await fetch(`${PROXY}/apify/${actorId}?token=${APIFY_TOKEN}&input=${encodeURIComponent(JSON.stringify(input))}`);
+  if(!res.ok)throw new Error(`HTTP ${res.status}`);
+  const data=await res.json();
+  addLog(`📦 ${actorId}: ${Array.isArray(data)?data.length:0} resultados`);
+  return Array.isArray(data)?data:[];
+}
+
+async function buscarResultados(){
+  const btn=event.target; btn.textContent="⏳ Buscando..."; btn.disabled=true;
+  logs.length=0;
+  document.getElementById('log-box').classList.add('hidden');
+  document.getElementById('res-error').style.display='none';
+  document.getElementById('res-empty').style.display='none';
+  state.resultados=[];
+  const asUrl=state.urls.autoscout||''; const wpUrl=state.urls.wallapop||''; const cnUrl=state.urls.cochesnet||'';
+  const todos=[];
+
+  const asP=runActor("blackfalcondata~autoscout24-scraper",{startUrls:[asUrl],maxResults:20})
+    .then(items=>items.slice(0,20).forEach(item=>todos.push({
+      titulo:item.title||`${item.make||""} ${item.model||""} ${item.year||""}`.trim()||"Sin título",
+      precio:item.price||item.priceValue||0, km:item.mileage||item.km||0,
+      año:item.year||item.firstRegistrationYear||0, portal:"AutoScout24",
+      url:item.url||item.listingUrl||asUrl,
+      desc:[item.fuelType,item.transmission,item.bodyType].filter(Boolean).join(", ")||"",
+      img:item.images?.[0]||item.imageUrl||null,
+    }))).catch(e=>addLog(`❌ AutoScout24: ${e.message}`));
+
+  const wpP=runActor("cptauad~wallapop-scraper",{startUrls:[wpUrl],maxItems:20})
+    .then(items=>items.slice(0,20).forEach(item=>todos.push({
+      titulo:item.title||item.name||"Sin título",
+      precio:item.price||item.salePrice||0, km:item.km||item.mileage||0,
+      año:item.year||0, portal:"Wallapop",
+      url:item.url||item.itemUrl||wpUrl,
+      desc:item.description?item.description.slice(0,80)+"...":"",
+      img:item.image||item.thumbnail||item.images?.[0]||null,
+    }))).catch(e=>addLog(`❌ Wallapop: ${e.message}`));
+
+  const cnP=runActor("ivanvs~coches-net-scraper",{startUrls:[cnUrl],maxItems:20})
+    .then(items=>items.slice(0,20).forEach(item=>todos.push({
+      titulo:item.title||`${item.make||""} ${item.model||""}`.trim()||"Sin título",
+      precio:item.price||0, km:item.mileage||item.km||0,
+      año:item.year||0, portal:"Coches.net",
+      url:item.url||cnUrl,
+      desc:[item.fuelType,item.transmission].filter(Boolean).join(", ")||"",
+      img:item.image||item.images?.[0]||null,
+    }))).catch(e=>addLog(`❌ Coches.net: ${e.message}`));
+
+  await Promise.allSettled([asP,wpP,cnP]);
+  state.resultados=todos;
+  if(todos.length===0){
+    document.getElementById('res-error').style.display='block';
+    document.getElementById('res-error').textContent="Sin resultados. Revisa el log de abajo.";
+  }
+  renderResultados();
+  btn.textContent="🔄 Actualizar resultados"; btn.disabled=false;
+}
+
+function renderResultados(){
+  const lista=document.getElementById('res-lista');
+  lista.innerHTML='';
+  if(!state.resultados.length){document.getElementById('res-empty').style.display='block';return;}
+  document.getElementById('res-empty').style.display='none';
+  const orden=document.getElementById('orden-res').value;
+  const sorted=[...state.resultados].sort((a,b)=>{
+    if(orden==="precio_asc")return a.precio-b.precio;
+    if(orden==="precio_desc")return b.precio-a.precio;
+    if(orden==="km_asc")return a.km-b.km;
+    if(orden==="año_desc")return b.año-a.año;
+    return 0;
+  });
+  const portalColor=name=>{const p=ALL_PORTALES.find(x=>x.name===name);return p?.color||"#718096";};
+  sorted.forEach(r=>{
+    const a=document.createElement('a');
+    a.href=r.url; a.target="_blank"; a.className="result-card";
+    a.innerHTML=`
+      ${r.img?`<img src="${r.img}" class="result-img" onerror="this.style.display='none'" alt="${r.titulo}">`:''}
+      <div class="result-body">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+            <span style="font-weight:700;font-size:14px;color:#1a202c">${r.titulo}</span>
+            <span class="badge" style="background:${portalColor(r.portal)}22;color:${portalColor(r.portal)}">${r.portal}</span>
+          </div>
+          <p style="margin:0 0 4px;font-size:12px;color:#718096;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.desc}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            ${r.año>0?`<span style="font-size:12px;color:#4a5568">📅 ${r.año}</span>`:''}
+            ${r.km>0?`<span style="font-size:12px;color:#4a5568">🛣️ ${r.km.toLocaleString("es")} km</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <p class="result-price">${r.precio>0?r.precio.toLocaleString("es")+"€":"—"}</p>
+          <span style="font-size:11px;color:#a0aec0">Ver →</span>
+        </div>
+      </div>`;
+    lista.appendChild(a);
+  });
+  const info=document.createElement('p');
+  info.style.cssText="text-align:center;font-size:11px;color:#a0aec0;margin-top:8px";
+  info.textContent=`${state.resultados.length} resultados · Ordena para comparar`;
+  lista.appendChild(info);
+}
+
+// RESUMEN WHATSAPP
+async function generarResumen(){
+  const btn=event.target; btn.textContent="⏳ Generando..."; btn.disabled=true;
+  const desc=`${state.marca!=="Cualquiera"?state.marca:"Cualquier marca"} ${state.modelo||""} | ${state.precioMin||"0"}–${state.precioMax||"∞"}€ | ${state.anyoMin||"?"}–${state.anyoMax||"?"} | Km máx: ${state.kmMax||"sin límite"}`;
+  const portalesActivos=ALL_PORTALES.filter(p=>state.activos.includes(p.id)).map(p=>p.name).join(", ");
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":ANTHROPIC_KEY,"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:700,messages:[{role:"user",content:`Genera un mensaje WhatsApp recordándome revisar hoy estos portales de coches. Incluye los parámetros de búsqueda, 2 consejos al comprar y cómo negociar. Emojis moderados. Máx 180 palabras.\n\nBúsqueda: ${desc}\nPortales: ${portalesActivos}`}]})
+    });
+    const d=await r.json();
+    state.resumen=d.content?.[0]?.text||"Error al generar.";
+    document.getElementById('resumen-texto').textContent=state.resumen;
+    document.getElementById('resumen-wa').style.display='block';
+    btn.style.display='none';
+  }catch(e){alert("Error al conectar con la IA.");}
+  btn.textContent="✨ Generar resumen con IA"; btn.disabled=false;
+}
+
+function enviarWA(){
+  const visibles=ALL_PORTALES.filter(p=>state.activos.includes(p.id));
+  const links=visibles.map(p=>`• ${p.name}: ${state.urls[p.id]||''}`).join("\n");
+  const txt=(state.resumen?state.resumen+"\n\n🔗 Links:\n":"🚗 Búsqueda de coches:\n\n")+links;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,"_blank");
+}
+
+// HISTORIAL
+function renderHistorial(){
+  const lista=document.getElementById('historial-lista');
+  lista.innerHTML='';
+  const btn=document.getElementById('btn-limpiar');
+  if(!state.historial.length){
+    lista.innerHTML='<div class="empty"><div class="icon">🕐</div><p>Aún no hay búsquedas guardadas</p></div>';
+    btn.style.display='none'; return;
+  }
+  btn.style.display='block';
+  state.historial.forEach(h=>{
+    const div=document.createElement('div'); div.className='card';
+    const portalesHtml=ALL_PORTALES.filter(p=>h.activos.includes(p.id)).map(p=>`<a href="${h.urls[p.id]||'#'}" target="_blank" style="font-size:11px;padding:3px 9px;border-radius:20px;background:${p.color};color:#fff;text-decoration:none;font-weight:500">${p.name}</a>`).join('');
+    div.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <p style="font-weight:700;font-size:14px;color:#1a202c;margin-bottom:3px">${h.marca!=="Cualquiera"?h.marca:"Todas las marcas"} ${h.modelo||""}</p>
+          <p style="font-size:12px;color:#718096">${h.precioMin||h.precioMax?`${h.precioMin?parseInt(h.precioMin).toLocaleString()+"–":""}${h.precioMax?parseInt(h.precioMax).toLocaleString():"∞"}€ · `:""}${h.anyoMin||h.anyoMax?`${h.anyoMin||"?"}–${h.anyoMax||"?"} · `:""}${h.activos.length} portales</p>
+        </div>
+        <span style="font-size:11px;color:#a0aec0;background:#f7f9fc;padding:2px 8px;border-radius:6px">${h.fecha}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${portalesHtml}</div>`;
+    lista.appendChild(div);
+  });
+}
+
+function limpiarHistorial(){state.historial=[];renderHistorial();}
+
+// INIT
+renderMarcas();
+onMarcaChange();
+renderPortalesSelector();
+renderHistorial();
+</script>
+</body>
+</html>
