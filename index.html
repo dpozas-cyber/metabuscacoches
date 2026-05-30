@@ -526,7 +526,34 @@ async function buscarResultados(){
   const asUrl=state.urls.autoscout||''; const wpUrl=state.urls.wallapop||''; const cnUrl=state.urls.cochesnet||'';
   const todos=[];
 
-  const asP=runActor("blackfalcondata~autoscout24-scraper",{startUrls:[asUrl],maxResults:20})
+  // Milanuncios scraper directo via proxy
+  const mnUrl = state.urls.milanuncios||'';
+  const mnP = (async()=>{
+    try {
+      addLog(`🚀 Lanzando Milanuncios (proxy)...`);
+      const r = await fetch(`${PROXY}/https://`+mnUrl.replace(/^https?:\/\//,""));
+      const html = await r.text();
+      const articles = html.match(/<article[^>]*ma-AdCardV2[^>]*>[\s\S]*?<\/article>/g)||[];
+      addLog(`📦 Milanuncios: ${articles.length} anuncios encontrados`);
+      articles.slice(0,20).forEach(art=>{
+        const titleM = art.match(/class="ma-AdCardV2-title[^"]*"[^>]*>([\s\S]*?)<\/h2>/);
+        const titulo = titleM ? titleM[1].replace(/<[^>]+>/g,'').trim() : "Sin título";
+        const priceM = art.match(/ma-AdPrice-value[^"]*">([\d.,\s]+)\s*€/);
+        const precio = priceM ? parseInt(priceM[1].replace(/[.,\s]/g,'')) : 0;
+        const hrefM = art.match(/href="(\/[^"]+\.htm)"/);
+        const url = hrefM ? `https://www.milanuncios.com${hrefM[1]}` : mnUrl;
+        const imgM = art.match(/class="ma-AdCardV2-photo[^"]*"[^>]*src="([^"]+)"/);
+        const img = imgM ? imgM[1] : null;
+        const tags = [...art.matchAll(/ma-AdTag-label"[^>]*title="([^"]+)"/g)].map(m=>m[1]);
+        const kmTag = tags.find(t=>/kms?$/i.test(t));
+        const añoTag = tags.find(t=>/^\d{4}$/.test(t));
+        const km = kmTag ? parseInt(kmTag.replace(/[.,\s]/g,'').replace(/kms?/i,'')) : 0;
+        const año = añoTag ? parseInt(añoTag) : 0;
+        const desc = tags.filter(t=>t!==kmTag&&t!==añoTag).join(', ');
+        todos.push({titulo,precio,km,año,portal:"Milanuncios",url,desc,img});
+      });
+    } catch(e){ addLog(`❌ Milanuncios: ${e.message}`); }
+  })();
     .then(items=>items.slice(0,20).forEach(item=>todos.push({
       titulo:item.title||`${item.make||""} ${item.model||""} ${item.year||""}`.trim()||"Sin título",
       precio:item.price||item.priceValue||0, km:item.mileage||item.km||0,
@@ -536,14 +563,14 @@ async function buscarResultados(){
       img:item.images?.[0]||item.imageUrl||null,
     }))).catch(e=>addLog(`❌ AutoScout24: ${e.message}`));
 
-const wpP=runActor("fayoussef~wallapop-scraper",{start_urls:[{url:wpUrl}],max_items:20})
+  const wpP=runActor("fayoussef~wallapop-scraper",{start_urls:[{url:wpUrl}],max_items:20})
     .then(items=>items.slice(0,20).forEach(item=>todos.push({
-      titulo:item.title||"Sin título",
-      precio:item.price||0, km:item.km||0,
+      titulo:item.title||item.name||"Sin título",
+      precio:item.price||item.salePrice||0, km:item.km||item.mileage||0,
       año:item.year||0, portal:"Wallapop",
-      url:item.listing_url||wpUrl,
+      url:item.url||item.itemUrl||wpUrl,
       desc:item.description?item.description.slice(0,80)+"...":"",
-      img:item.images?.[0]||null,
+      img:item.image||item.thumbnail||item.images?.[0]||null,
     }))).catch(e=>addLog(`❌ Wallapop: ${e.message}`));
 
   const cnP=runActor("kaidev~coches-net-scraper",{startUrls:[{url:cnUrl}],maxItems:20})
@@ -556,7 +583,7 @@ const wpP=runActor("fayoussef~wallapop-scraper",{start_urls:[{url:wpUrl}],max_it
       img:item.image||item.images?.[0]||null,
     }))).catch(e=>addLog(`❌ Coches.net: ${e.message}`));
 
-  await Promise.allSettled([asP,wpP,cnP]);
+  await Promise.allSettled([mnP, asP, wpP, cnP]);
   state.resultados=todos;
   if(todos.length===0){
     document.getElementById('res-error').style.display='block';
