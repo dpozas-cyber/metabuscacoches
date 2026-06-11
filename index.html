@@ -63,6 +63,10 @@ h1{font-size:19px;font-weight:700}
       <option value="km_asc">🛣️ Menos kilómetros</option>
       <option value="ano_desc">📅 Más nuevos primero</option>
     </select>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="inp" id="btnMila" style="cursor:pointer;font-weight:600;color:#e67e22;border-color:#e67e22" onclick="agregarMilanuncios()">➕ Milanuncios</button>
+      <button class="inp" id="btnPark" style="cursor:pointer;font-weight:600;color:#e91e63;border-color:#e91e63" onclick="agregarTheParking()">➕ The Parking</button>
+    </div>
   </div>
 
   <!-- RESULTADOS -->
@@ -116,8 +120,9 @@ var MM = {
 "Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"]
 };
 var MARCAS = Object.keys(MM);
-var MARCA_IDS = {"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 var APIFY_TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
+var PROXY = "https://metabuscador.dpozas.workers.dev";
+var MARCA_IDS = {"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 var resultados = [];
 
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
@@ -240,6 +245,99 @@ function buscar(){
       renderResultados();
     }
   });
+}
+
+// ====== PORTALES EXTRA (via Worker proxy + parseo HTML) ======
+function urlMilanuncios(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var mId = marca?(MARCA_IDS[marca]||""):"";
+  var q="demanda=n&orden=relevance&fromSearch=1";
+  if(mId)q+="&marca="+mId;
+  if(val("precioMin"))q+="&desde="+val("precioMin");
+  if(val("precioMax"))q+="&hasta="+val("precioMax");
+  if(val("anoMin"))q+="&anod="+val("anoMin");
+  if(val("anoMax"))q+="&anoh="+val("anoMax");
+  if(val("kmMax"))q+="&kilometersTo="+val("kmMax");
+  return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;
+}
+
+function urlTheParking(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var modelo = val("selModelo")||"";
+  var base = marca?(slug(marca)+(modelo?"-"+slug(modelo):"")):"coches";
+  return "https://www.theparking.eu/used-cars/"+base+".html";
+}
+
+function agregarMilanuncios(){
+  var btn=document.getElementById("btnMila");
+  btn.disabled=true;btn.textContent="⏳ Milanuncios...";
+  var target=urlMilanuncios();
+  addLog("🌐 Descargando Milanuncios via Worker...");
+  fetch(PROXY+"/"+target)
+    .then(function(r){return r.text();})
+    .then(function(html){
+      var doc=new DOMParser().parseFromString(html,"text/html");
+      var cards=doc.querySelectorAll('article, [class*="AdCard"]');
+      var antes=resultados.length;
+      cards.forEach(function(c){
+        var tEl=c.querySelector('h2, h3, [class*="Title"]');
+        var pEl=c.querySelector('[class*="Price"], [class*="price"]');
+        var aEl=c.querySelector('a[href*="/"]');
+        if(!tEl||!aEl)return;
+        var precio=0;
+        if(pEl){var pm=pEl.textContent.replace(/[.\s]/g,"").match(/(\d+)/);if(pm)precio=parseInt(pm[1],10);}
+        var kmM=c.textContent.match(/([\d.]+)\s*kms?/i);
+        var anoM=c.textContent.match(/\b(19|20)\d{2}\b/);
+        var href=aEl.getAttribute("href")||"";
+        if(href.indexOf("http")!==0)href="https://www.milanuncios.com"+href;
+        resultados.push({titulo:tEl.textContent.trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:anoM?parseInt(anoM[0],10):0,portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+      });
+      var nuevos=resultados.length-antes;
+      addLog("📦 Milanuncios: "+nuevos+" resultados"+(nuevos===0?" (parseo falló o anti-bot)":""));
+      btn.disabled=false;btn.textContent=nuevos>0?"✓ Milanuncios ("+nuevos+")":"➕ Milanuncios";
+      if(nuevos>0)renderResultados();
+    })
+    .catch(function(e){
+      addLog("❌ Milanuncios: "+e.message);
+      btn.disabled=false;btn.textContent="➕ Milanuncios";
+    });
+}
+
+function agregarTheParking(){
+  var btn=document.getElementById("btnPark");
+  btn.disabled=true;btn.textContent="⏳ The Parking...";
+  var target=urlTheParking();
+  addLog("🌐 Descargando The Parking via Worker...");
+  fetch(PROXY+"/"+target)
+    .then(function(r){return r.text();})
+    .then(function(html){
+      var doc=new DOMParser().parseFromString(html,"text/html");
+      var cards=doc.querySelectorAll('li[class*="annonce"], [class*="resultat"], [class*="car-card"], article');
+      var antes=resultados.length;
+      var pMin=parseInt(val("precioMin")||"0",10), pMax=parseInt(val("precioMax")||"99999999",10);
+      cards.forEach(function(c){
+        var aEl=c.querySelector('a[href*="/used-cars/"], a[href*="/coches/"]')||c.querySelector("a");
+        var txt=c.textContent||"";
+        var pm=txt.replace(/[.\s\u00a0]/g,"").match(/(\d{3,7})€/);
+        if(!aEl||!pm)return;
+        var precio=parseInt(pm[1],10);
+        if(precio<pMin||precio>pMax)return; // The Parking no filtra en servidor: filtramos aquí
+        var kmM=txt.match(/([\d.\s\u00a0]+)\s*km/i);
+        var anoM=txt.match(/\b(19|20)\d{2}\b/);
+        var tEl=c.querySelector("h2, h3, [class*=title]");
+        var href=aEl.getAttribute("href")||"";
+        if(href.indexOf("http")!==0)href="https://www.theparking.eu"+href;
+        resultados.push({titulo:(tEl?tEl.textContent:txt.slice(0,50)).trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/[.\s\u00a0]/g,""),10):0,ano:anoM?parseInt(anoM[0],10):0,portal:"The Parking",color:"#e91e63",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+      });
+      var nuevos=resultados.length-antes;
+      addLog("📦 The Parking: "+nuevos+" resultados"+(nuevos===0?" (parseo falló o anti-bot)":""));
+      btn.disabled=false;btn.textContent=nuevos>0?"✓ The Parking ("+nuevos+")":"➕ The Parking";
+      if(nuevos>0)renderResultados();
+    })
+    .catch(function(e){
+      addLog("❌ The Parking: "+e.message);
+      btn.disabled=false;btn.textContent="➕ The Parking";
+    });
 }
 
 function renderResultados(){
