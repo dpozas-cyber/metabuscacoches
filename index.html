@@ -8,40 +8,25 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f7f9fc;color:#1a202c}
 .wrap{max-width:680px;margin:0 auto;padding:24px 16px}
-.header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#1a6fb5,#2980b9);display:flex;align-items:center;justify-content:center;font-size:22px}
 h1{font-size:19px;font-weight:700}
 .sub{font-size:12px;color:#718096}
-.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
-.tab{padding:8px 14px;border-radius:8px;border:none;background:#e2e8f0;color:#4a5568;cursor:pointer;font-size:13px}
-.tab.active{background:#1a6fb5;color:#fff;font-weight:600}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-.card-title{font-weight:700;font-size:14px;margin-bottom:12px}
 .lbl{font-size:12px;color:#718096;display:block;margin-bottom:4px;font-weight:500}
 .inp{padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:14px;width:100%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .span2{grid-column:span 2}
-.chip{padding:5px 12px;border-radius:20px;border:2px solid #e2e8f0;background:transparent;color:#718096;cursor:pointer;font-size:12px;font-weight:500;margin:0 6px 6px 0;display:inline-block}
 .btn-main{width:100%;padding:14px;background:linear-gradient(135deg,#1a6fb5,#2980b9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(26,111,181,0.35)}
-.btn-purple{width:100%;padding:10px;margin-bottom:12px;background:linear-gradient(135deg,#6b46c1,#805ad5);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer}
-.btn-outline{width:100%;padding:11px;background:transparent;color:#1a6fb5;border:2px solid #1a6fb5;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin:4px 0 16px}
-.btn-wa{width:100%;padding:11px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
-.portal{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;margin-bottom:8px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.portal-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.portal-name{font-weight:600;font-size:14px;color:#1a202c}
-.portal-url{font-size:10px;color:#a0aec0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
-.badge{font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600}
-.open-btn{font-size:12px;padding:4px 12px;border-radius:6px;color:#fff;flex-shrink:0;margin-left:8px;font-weight:500}
-.cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin:10px 0 6px}
-.summary{background:#ebf4ff;border:1px solid #bee3f8}
+.btn-main:disabled{background:#a0aec0;cursor:not-allowed;box-shadow:none}
 .result{display:flex;align-items:stretch;border-radius:10px;border:1px solid #e2e8f0;background:#fff;margin-bottom:8px;text-decoration:none;overflow:hidden}
 .result img{width:100px;min-height:80px;object-fit:cover;flex-shrink:0}
+.badge{font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600}
 .log{background:#1a202c;border-radius:12px;padding:12px 16px;margin-top:12px}
 .log p{font-size:11px;color:#e2e8f0;font-family:monospace;margin:2px 0;line-height:1.4}
 .hidden{display:none}
 .empty{text-align:center;padding:48px 0;color:#a0aec0}
-.hist-pill{font-size:11px;padding:3px 9px;border-radius:20px;color:#fff;text-decoration:none;font-weight:500;display:inline-block;margin:0 5px 5px 0}
 </style>
 </head>
 <body>
@@ -50,98 +35,44 @@ h1{font-size:19px;font-weight:700}
     <div class="logo">🔍</div>
     <div>
       <h1>Metabuscador de coches</h1>
-      <p class="sub">13 portales · segunda mano + ex-renting</p>
+      <p class="sub">AutoScout24 · Wallapop · Coches.net</p>
     </div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" id="tab-config" onclick="showTab('config')">⚙️ Filtros</button>
-    <button class="tab" id="tab-buscar" onclick="showTab('buscar')">🔗 Portales</button>
-    <button class="tab" id="tab-resultados" onclick="showTab('resultados')">📋 Resultados</button>
-    <button class="tab" id="tab-historial" onclick="showTab('historial')">🕐 Historial</button>
+  <!-- FILTROS -->
+  <div class="card">
+    <div class="grid2">
+      <div><label class="lbl">Marca</label><select class="inp" id="selMarca" onchange="onMarca()"></select></div>
+      <div><label class="lbl">Modelo</label><select class="inp" id="selModelo"><option value="">Cualquiera</option></select></div>
+      <div><label class="lbl">Precio desde (€)</label><input type="number" class="inp" id="precioMin" placeholder="0"></div>
+      <div><label class="lbl">Precio hasta (€)</label><input type="number" class="inp" id="precioMax" placeholder="20.000"></div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div><label class="lbl">Año desde</label><input type="number" class="inp" id="anoMin" placeholder="2015"></div>
+      <div><label class="lbl">Año hasta</label><input type="number" class="inp" id="anoMax" placeholder="2024"></div>
+      <div><label class="lbl">Km máximos</label><input type="number" class="inp" id="kmMax" placeholder="100.000"></div>
+    </div>
+    <button class="btn-main" id="btnBuscar" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
   </div>
 
-  <!-- CONFIG -->
-  <div id="panel-config">
-    <div class="card">
-      <p class="card-title">Portales activos (<span id="activos-count"></span>/13)</p>
-      <div id="portales-chips"></div>
-    </div>
-    <div class="card">
-      <p class="card-title">Vehículo</p>
-      <div class="grid2">
-        <div><label class="lbl">Buscar marca</label><input class="inp" id="filtroMarca" placeholder="Escribe para filtrar..." oninput="renderMarcas()"></div>
-        <div><label class="lbl">Marca</label><select class="inp" id="selMarca" onchange="onMarca()"></select></div>
-        <div class="span2"><label class="lbl">Modelo</label><select class="inp" id="selModelo"><option value="">Cualquiera</option></select></div>
-      </div>
-    </div>
-    <div class="card">
-      <p class="card-title">Precio (€)</p>
-      <div class="grid2">
-        <div><label class="lbl">Desde</label><input type="number" class="inp" id="precioMin" placeholder="0"></div>
-        <div><label class="lbl">Hasta</label><input type="number" class="inp" id="precioMax" placeholder="20.000"></div>
-      </div>
-    </div>
-    <div class="card">
-      <p class="card-title">Año y kilometraje</p>
-      <div class="grid3">
-        <div><label class="lbl">Año desde</label><input type="number" class="inp" id="anoMin" placeholder="2015"></div>
-        <div><label class="lbl">Año hasta</label><input type="number" class="inp" id="anoMax" placeholder="2024"></div>
-        <div><label class="lbl">Km máximos</label><input type="number" class="inp" id="kmMax" placeholder="100.000"></div>
-      </div>
-    </div>
-    <button class="btn-main" onclick="preparar()">🔍 Preparar búsqueda</button>
-  </div>
-
-  <!-- BUSCAR -->
-  <div id="panel-buscar" class="hidden">
-    <div class="card summary">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <p style="font-weight:700;font-size:14px;color:#2c5282" id="resumen-titulo"></p>
-          <p style="font-size:12px;color:#4a5568" id="resumen-filtros"></p>
-        </div>
-        <button class="tab" onclick="showTab('config')" style="font-size:12px">✏️ Editar</button>
-      </div>
-    </div>
-    <button class="btn-purple" id="btnContar" onclick="contarResultados()">🔢 Contar resultados en cada portal</button>
-    <div id="lista-portales"></div>
-    <button class="btn-outline" onclick="abrirTodos()">🚀 Abrir todos los portales a la vez</button>
-    <div class="card">
-      <p class="card-title">📲 Resumen para WhatsApp</p>
-      <button class="btn-wa" id="btnWA" onclick="enviarWA()">📱 Enviar links por WhatsApp</button>
-    </div>
+  <!-- ORDEN -->
+  <div id="barra-orden" class="hidden" style="margin-bottom:12px">
+    <select class="inp" id="ordenRes" onchange="renderResultados()">
+      <option value="precio_asc">💰 Precio: menor primero</option>
+      <option value="precio_desc">💰 Precio: mayor primero</option>
+      <option value="km_asc">🛣️ Menos kilómetros</option>
+      <option value="ano_desc">📅 Más nuevos primero</option>
+    </select>
   </div>
 
   <!-- RESULTADOS -->
-  <div id="panel-resultados" class="hidden">
-    <div class="card" style="background:#fffbeb;border:1px solid #fbd38d">
-      <p style="font-weight:700;font-size:13px;color:#744210;margin-bottom:4px">⚠️ Resultados via Apify</p>
-      <p style="font-size:12px;color:#92400e">AutoScout24, Wallapop y Coches.net. Puede tardar 30–90 segundos.</p>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn-purple" id="btnBuscarRes" style="flex:1;min-width:160px;margin-bottom:0" onclick="buscarResultados()">🔎 Buscar resultados</button>
-      <select class="inp" id="ordenRes" style="width:auto;flex:1;min-width:140px" onchange="renderResultados()">
-        <option value="precio_asc">💰 Precio: menor primero</option>
-        <option value="precio_desc">💰 Precio: mayor primero</option>
-        <option value="km_asc">🛣️ Menos kilómetros</option>
-        <option value="ano_desc">📅 Más nuevos primero</option>
-      </select>
-    </div>
-    <div id="res-estado" class="empty"><div style="font-size:40px">📋</div><p style="font-weight:600;color:#718096">Pulsa "Buscar resultados" para empezar</p></div>
-    <div id="res-lista"></div>
-    <div id="res-log" class="log hidden"></div>
-  </div>
-
-  <!-- HISTORIAL -->
-  <div id="panel-historial" class="hidden">
-    <div id="hist-lista"><div class="empty"><div style="font-size:40px">🕐</div><p>Aún no hay búsquedas guardadas</p></div></div>
-  </div>
+  <div id="estado" class="empty"><div style="font-size:40px">🚗</div><p style="font-weight:600;color:#718096">Configura los filtros y pulsa Buscar</p></div>
+  <div id="lista"></div>
+  <div id="log" class="log hidden"></div>
 </div>
 
 <script>
 "use strict";
-// ====== DATOS ======
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -186,141 +117,11 @@ var MM = {
 };
 var MARCAS = Object.keys(MM);
 var MARCA_IDS = {"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
-var MOTOR_MARCA_IDS = {"Alfa Romeo":"1","Audi":"6","BMW":"7","Citroën":"10","Cupra":"77","Dacia":"71","DS":"76","Ferrari":"14","Fiat":"15","Ford":"16","Honda":"19","Hyundai":"20","Jaguar":"22","Jeep":"23","Kia":"25","Lamborghini":"27","Land Rover":"28","Lexus":"29","Maserati":"33","Mazda":"34","McLaren":"74","Mercedes":"35","MG":"73","Mini":"38","Mitsubishi":"37","Nissan":"40","Opel":"41","Peugeot":"42","Porsche":"45","Renault":"48","Seat":"52","Skoda":"53","Smart":"54","Subaru":"57","Suzuki":"58","Tesla":"69","Toyota":"59","Volkswagen":"64","Volvo":"65"};
-var CAT_COLORS = {portal:"#1a6fb5",clasificados:"#e67e22",dealer:"#8e44ad",metabuscador:"#e91e63",renting:"#1abc9c"};
-var CAT_LABELS = {portal:"Portales",clasificados:"Clasificados",dealer:"Dealers",metabuscador:"Metabuscadores",renting:"Renting"};
-var PROXY = "https://metabuscador.dpozas.workers.dev";
 var APIFY_TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
-
-var activos = ["autoscout","milanuncios","cochesnet","autocasion","cochescom","flexicar","ocasionplus","wallapop","motor","theparking","ayvens","arval","athlon"];
-var urlsActuales = [];
 var resultados = [];
-var historial = [];
 
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function val(id){return document.getElementById(id).value;}
-
-function buildUrls(){
-  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
-  var modelo = val("selModelo")||"";
-  var pMin=val("precioMin"), pMax=val("precioMax");
-  var aMin=val("anoMin"), aMax=val("anoMax");
-  var km=val("kmMax");
-  var mSlug = marca?slug(marca):"", moSlug = modelo?slug(modelo):"";
-  var mId = marca?(MARCA_IDS[marca]||""):"";
-  var mtMId = marca?(MOTOR_MARCA_IDS[marca]||""):"";
-
-  // AutoScout24
-  var as="atype=C&ustate=N,U&cy=E&desc=0&sort=standard";
-  if(pMin)as+="&pricefrom="+pMin; if(pMax)as+="&priceto="+pMax;
-  if(aMin)as+="&fregfrom="+aMin; if(aMax)as+="&fregto="+aMax;
-  if(km)as+="&kmto="+km;
-  var asUrl="https://www.autoscout24.es"+(marca?("/lst/"+mSlug+(moSlug?"/"+moSlug:"")):"/lst")+"?"+as;
-
-  // Milanuncios
-  var mn="demanda=n&orden=relevance&fromSearch=1";
-  if(mId)mn+="&marca="+mId;
-  if(pMin)mn+="&desde="+pMin; if(pMax)mn+="&hasta="+pMax;
-  if(aMin)mn+="&anod="+aMin; if(aMax)mn+="&anoh="+aMax;
-  if(km)mn+="&kilometersTo="+km;
-  var mnUrl="https://www.milanuncios.com/coches-de-segunda-mano/?"+mn;
-
-  // Coches.net
-  var cn="";
-  if(mId)cn+="MakeIds[0]="+mId;
-  if(pMin)cn+=(cn?"&":"")+"MinPrice="+pMin; if(pMax)cn+=(cn?"&":"")+"MaxPrice="+pMax;
-  if(aMin)cn+=(cn?"&":"")+"MinYear="+aMin; if(aMax)cn+=(cn?"&":"")+"MaxYear="+aMax;
-  if(km)cn+=(cn?"&":"")+"MaxKms="+km;
-  var cnUrl="https://www.coches.net/search/"+(cn?"?"+cn:"");
-
-  // Autocasión
-  var acBase=marca?(mSlug+(moSlug?"-"+moSlug:"")+"-ocasion"):"";
-  var acF="";
-  if(aMin)acF+="/fecha-desde-"+aMin; if(aMax)acF+="/fecha-hasta-"+aMax;
-  if(pMin)acF+="/precio-desde-"+pMin; if(pMax)acF+="/precio-hasta-"+pMax;
-  if(km)acF+="/km-hasta-"+km;
-  var acUrl="https://www.autocasion.com/coches-segunda-mano/"+acBase+acF;
-
-  // Coches.com
-  var cc="";
-  if(pMin)cc+="precio_desde="+pMin; if(pMax)cc+=(cc?"&":"")+"precio_hasta="+pMax;
-  if(aMin)cc+=(cc?"&":"")+"anyo_desde="+aMin; if(aMax)cc+=(cc?"&":"")+"anyo_hasta="+aMax;
-  if(km)cc+=(cc?"&":"")+"km_hasta="+km;
-  var ccUrl=marca?("https://www.coches.com/coches-segunda-mano/"+mSlug+(moSlug?"-"+moSlug:"")+".htm"+(cc?"?"+cc:"")):("https://www.coches.com/coches-segunda-mano/"+(cc?"?"+cc:""));
-
-  // Flexicar
-  var fx="";
-  if(marca)fx+="brands="+mSlug; if(modelo)fx+=(fx?"&":"")+"models="+moSlug;
-  if(pMin)fx+=(fx?"&":"")+"priceFrom="+pMin; if(pMax)fx+=(fx?"&":"")+"priceTo="+pMax;
-  if(aMin)fx+=(fx?"&":"")+"yearFrom="+aMin; if(aMax)fx+=(fx?"&":"")+"yearTo="+aMax;
-  if(km)fx+=(fx?"&":"")+"kmTo="+km;
-  var fxUrl="https://www.flexicar.es/coches-segunda-mano/search/"+(fx?"?"+fx:"");
-
-  // Wallapop
-  var wp="category_id=100&order_by=most_relevance";
-  if(marca)wp+="&brand="+encodeURIComponent(marca); if(modelo)wp+="&model="+encodeURIComponent(modelo);
-  if(pMin)wp+="&min_sale_price="+pMin; if(pMax)wp+="&max_sale_price="+pMax;
-  if(km)wp+="&max_km="+km; if(aMin)wp+="&min_year="+aMin; if(aMax)wp+="&max_year="+aMax;
-  var wpUrl="https://es.wallapop.com/search?"+wp;
-
-  // Motor.es
-  var mt="";
-  if(mtMId)mt+="marca="+mtMId;
-  if(pMin)mt+=(mt?"&":"")+"precio_min="+pMin; if(pMax)mt+=(mt?"&":"")+"precio_max="+pMax;
-  if(aMin)mt+=(mt?"&":"")+"matriculacion_min="+aMin; if(aMax)mt+=(mt?"&":"")+"matriculacion_max="+aMax;
-  if(km)mt+=(mt?"&":"")+"km_max="+km;
-  var mtUrl="https://www.motor.es/segunda-mano/coches/"+(mt?"?"+mt:"");
-
-  // The Parking
-  var tpBase=marca?(mSlug+(moSlug?"-"+moSlug:"")):"";
-  var tpPath="https://www.theparking.eu/used-cars/"+(tpBase||"coches")+".html";
-  var tpF="";
-  if(pMin||pMax)tpF+="slider_prix="+(pMin||"1")+"|"+(pMax||"999999");
-  if(aMin||aMax)tpF+=(tpF?"&":"")+"slider_millesime="+(aMin||"1900")+"|"+(aMax||"2099");
-  if(km)tpF+=(tpF?"&":"")+"slider_kilometrage=0|"+km;
-  var tpUrl=tpF?(tpPath+"#!/used-cars/"+(tpBase||"coches")+".html%3F"+encodeURIComponent(tpF)):tpPath;
-
-  return [
-    {id:"autoscout",name:"AutoScout24",color:"#f47920",cat:"portal",url:asUrl},
-    {id:"milanuncios",name:"Milanuncios",color:"#e67e22",cat:"clasificados",url:mnUrl},
-    {id:"cochesnet",name:"Coches.net",color:"#1a6fb5",cat:"portal",url:cnUrl},
-    {id:"autocasion",name:"Autocasión",color:"#c0392b",cat:"portal",url:acUrl},
-    {id:"cochescom",name:"Coches.com",color:"#27ae60",cat:"portal",url:ccUrl},
-    {id:"flexicar",name:"Flexicar",color:"#2471a3",cat:"dealer",url:fxUrl},
-    {id:"ocasionplus",name:"OcasionPlus",color:"#8e44ad",cat:"dealer",url:"https://www.ocasionplus.com/coches-segunda-mano"},
-    {id:"wallapop",name:"Wallapop",color:"#13c1ac",cat:"clasificados",url:wpUrl},
-    {id:"motor",name:"Motor.es",color:"#16a085",cat:"portal",url:mtUrl},
-    {id:"theparking",name:"The Parking",color:"#e91e63",cat:"metabuscador",url:tpUrl},
-    {id:"ayvens",name:"Ayvens Ocasión",color:"#1abc9c",cat:"renting",url:"https://used-cars.ayvens.com/es-es/catalog"},
-    {id:"arval",name:"Arval AutoSelect",color:"#e74c3c",cat:"renting",url:"https://autoselect.arval.es/coches-segunda-mano-ocasion"},
-    {id:"athlon",name:"Athlon Ocasión",color:"#f39c12",cat:"renting",url:"https://www.athlon.com/es/vehiculos-de-ocasion/venta-a-particular/"}
-  ];
-}
-
-// ====== UI ======
-function showTab(t){
-  var tabs=["config","buscar","resultados","historial"];
-  for(var i=0;i<tabs.length;i++){
-    document.getElementById("panel-"+tabs[i]).className = tabs[i]===t?"":"hidden";
-    document.getElementById("tab-"+tabs[i]).className = tabs[i]===t?"tab active":"tab";
-  }
-}
-
-function renderMarcas(){
-  var f=val("filtroMarca").toLowerCase();
-  var sel=document.getElementById("selMarca");
-  var cur=sel.value;
-  sel.innerHTML="";
-  for(var i=0;i<MARCAS.length;i++){
-    var m=MARCAS[i];
-    if(m==="Cualquiera"||m.toLowerCase().indexOf(f)!==-1){
-      var o=document.createElement("option");o.textContent=m;sel.appendChild(o);
-    }
-  }
-  if(cur)sel.value=cur;
-  if(!sel.value)sel.selectedIndex=0;
-  onMarca();
-}
 
 function onMarca(){
   var m=val("selMarca");
@@ -333,119 +134,42 @@ function onMarca(){
   sel.disabled = m==="Cualquiera";
 }
 
-function renderChips(){
-  var urls=buildUrls();
-  var cats=["portal","clasificados","dealer","metabuscador","renting"];
-  var html="";
-  for(var c=0;c<cats.length;c++){
-    html+='<p class="cat-label" style="color:'+CAT_COLORS[cats[c]]+'">'+CAT_LABELS[cats[c]]+'</p>';
-    for(var i=0;i<urls.length;i++){
-      var u=urls[i];
-      if(u.cat!==cats[c])continue;
-      var on=activos.indexOf(u.id)!==-1;
-      html+='<button class="chip" style="'+(on?'border-color:'+u.color+';background:'+u.color+';color:#fff':'')+'" onclick="toggleA(\''+u.id+'\')">'+(on?'✓ ':'')+u.name+'</button>';
-    }
-  }
-  document.getElementById("portales-chips").innerHTML=html;
-  document.getElementById("activos-count").textContent=activos.length;
+function buildUrls(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var modelo = val("selModelo")||"";
+  var pMin=val("precioMin"), pMax=val("precioMax");
+  var aMin=val("anoMin"), aMax=val("anoMax");
+  var km=val("kmMax");
+  var mSlug = marca?slug(marca):"", moSlug = modelo?slug(modelo):"";
+  var mId = marca?(MARCA_IDS[marca]||""):"";
+
+  // AutoScout24
+  var as="atype=C&ustate=N,U&cy=E&desc=0&sort=standard";
+  if(pMin)as+="&pricefrom="+pMin; if(pMax)as+="&priceto="+pMax;
+  if(aMin)as+="&fregfrom="+aMin; if(aMax)as+="&fregto="+aMax;
+  if(km)as+="&kmto="+km;
+  var asUrl="https://www.autoscout24.es"+(marca?("/lst/"+mSlug+(moSlug?"/"+moSlug:"")):"/lst")+"?"+as;
+
+  // Wallapop
+  var wp="category_id=100&order_by=most_relevance";
+  if(marca)wp+="&brand="+encodeURIComponent(marca); if(modelo)wp+="&model="+encodeURIComponent(modelo);
+  if(pMin)wp+="&min_sale_price="+pMin; if(pMax)wp+="&max_sale_price="+pMax;
+  if(km)wp+="&max_km="+km; if(aMin)wp+="&min_year="+aMin; if(aMax)wp+="&max_year="+aMax;
+  var wpUrl="https://es.wallapop.com/search?"+wp;
+
+  // Coches.net
+  var cn="";
+  if(mId)cn+="MakeIds[0]="+mId;
+  if(pMin)cn+=(cn?"&":"")+"MinPrice="+pMin; if(pMax)cn+=(cn?"&":"")+"MaxPrice="+pMax;
+  if(aMin)cn+=(cn?"&":"")+"MinYear="+aMin; if(aMax)cn+=(cn?"&":"")+"MaxYear="+aMax;
+  if(km)cn+=(cn?"&":"")+"MaxKms="+km;
+  var cnUrl="https://www.coches.net/search/"+(cn?"?"+cn:"");
+
+  return {autoscout:asUrl, wallapop:wpUrl, cochesnet:cnUrl};
 }
 
-function toggleA(id){
-  var idx=activos.indexOf(id);
-  if(idx===-1)activos.push(id);else activos.splice(idx,1);
-  renderChips();
-}
-
-function preparar(){
-  urlsActuales=buildUrls();
-  var marca=val("selMarca"), modelo=val("selModelo");
-  document.getElementById("resumen-titulo").textContent=(marca!=="Cualquiera"?marca:"Cualquier marca")+(modelo?" · "+modelo:"");
-  var f="";
-  if(val("precioMin")||val("precioMax"))f+=(val("precioMin")||"0")+"–"+(val("precioMax")||"∞")+"€  ";
-  if(val("anoMin")||val("anoMax"))f+=(val("anoMin")||"?")+"–"+(val("anoMax")||"?")+"  ";
-  if(val("kmMax"))f+="hasta "+val("kmMax")+" km";
-  document.getElementById("resumen-filtros").textContent=f||"Sin filtros adicionales";
-  historial.unshift({fecha:new Date().toLocaleString("es-ES"),titulo:document.getElementById("resumen-titulo").textContent,urls:urlsActuales.filter(function(u){return activos.indexOf(u.id)!==-1;})});
-  if(historial.length>20)historial.pop();
-  renderPortales();
-  renderHistorial();
-  showTab("buscar");
-}
-
-function renderPortales(){
-  var html="";
-  for(var i=0;i<urlsActuales.length;i++){
-    var u=urlsActuales[i];
-    if(activos.indexOf(u.id)===-1)continue;
-    html+='<a class="portal" href="'+u.url+'" target="_blank" rel="noreferrer" style="border-color:'+u.color+'44">'
-      +'<div style="display:flex;align-items:center;gap:10px;min-width:0">'
-      +'<div class="portal-icon" style="background:'+u.color+'">🔗</div>'
-      +'<div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
-      +'<span class="portal-name">'+u.name+'</span>'
-      +'<span class="badge" style="background:'+CAT_COLORS[u.cat]+'22;color:'+CAT_COLORS[u.cat]+'">'+u.cat+'</span>'
-      +'<span class="badge hidden" id="conteo-'+u.id+'" style="background:#ebf4ff;color:#2b6cb0;border:1px solid #bee3f8"></span>'
-      +'</div><p class="portal-url">'+u.url+'</p></div></div>'
-      +'<span class="open-btn" style="background:'+u.color+'">Abrir</span></a>';
-  }
-  document.getElementById("lista-portales").innerHTML=html;
-}
-
-function abrirTodos(){
-  var vis=urlsActuales.filter(function(u){return activos.indexOf(u.id)!==-1;});
-  for(var i=0;i<vis.length;i++){
-    (function(u,delay){setTimeout(function(){window.open(u.url,"_blank");},delay);})(vis[i],i*250);
-  }
-}
-
-function enviarWA(){
-  var vis=urlsActuales.filter(function(u){return activos.indexOf(u.id)!==-1;});
-  var txt="🚗 Búsqueda de coches: "+document.getElementById("resumen-titulo").textContent+"\n\n";
-  for(var i=0;i<vis.length;i++)txt+="• "+vis[i].name+": "+vis[i].url+"\n";
-  window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");
-}
-
-// ====== CONTEOS ======
-function extraerConteo(id,html){
-  var pats={
-    autoscout:[/(\d[\d.,]+)\s*(?:Anuncios|anuncios|Resultados|resultados)/i],
-    milanuncios:[/(\d[\d.,]+)\s*anuncios?/i,/"numFound":(\d+)/],
-    cochesnet:[/(\d[\d.,]+)\s*(?:coches?|veh\u00edculos?|resultados?)/i,/"totalResults":(\d+)/],
-    wallapop:[/"totalElements":(\d+)/,/(\d[\d.,]+)\s*(?:coches?|resultados?)/i]
-  };
-  var lista=pats[id]||[/(\d[\d.,]+)\s*(?:coches?|resultados?|anuncios?)/i];
-  for(var i=0;i<lista.length;i++){
-    var m=html.match(lista[i]);
-    if(m){var n=parseInt(m[1].replace(/[.,]/g,""),10);if(!isNaN(n)&&n>0)return n.toLocaleString("es")+" resultados";}
-  }
-  return "sin datos";
-}
-
-function contarResultados(){
-  var btn=document.getElementById("btnContar");
-  btn.disabled=true;btn.textContent="⏳ Contando...";
-  var portales=urlsActuales.filter(function(u){return activos.indexOf(u.id)!==-1&&["ayvens","arval","athlon"].indexOf(u.id)===-1;});
-  var pendientes=portales.length;
-  function done(){pendientes--;if(pendientes<=0){btn.disabled=false;btn.textContent="🔢 Contar resultados en cada portal";}}
-  portales.forEach(function(u){
-    fetch(PROXY+"/https://"+u.url.replace(/^https?:\/\//,""))
-      .then(function(r){return r.text();})
-      .then(function(html){
-        var el=document.getElementById("conteo-"+u.id);
-        if(el){el.textContent=extraerConteo(u.id,html);el.className="badge";}
-        done();
-      })
-      .catch(function(){
-        var el=document.getElementById("conteo-"+u.id);
-        if(el){el.textContent="error";el.className="badge";}
-        done();
-      });
-  });
-  if(portales.length===0)done();
-}
-
-// ====== RESULTADOS APIFY ======
 function addLog(msg){
-  var log=document.getElementById("res-log");
+  var log=document.getElementById("log");
   log.className="log";
   var p=document.createElement("p");
   p.textContent=new Date().toLocaleTimeString()+": "+msg;
@@ -454,8 +178,12 @@ function addLog(msg){
 
 function runActor(actorId,input){
   addLog("🚀 Lanzando "+actorId+"...");
-  var inputEnc=encodeURIComponent(JSON.stringify(input));
-  return fetch(PROXY+"/apify/"+actorId+"?token="+APIFY_TOKEN+"&input="+inputEnc)
+  var apifyUrl="https://api.apify.com/v2/acts/"+actorId+"/run-sync-get-dataset-items?token="+APIFY_TOKEN+"&timeout=120&memory=1024";
+  return fetch(apifyUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(input)
+  })
     .then(function(r){
       if(!r.ok)return r.text().then(function(t){throw new Error("HTTP "+r.status+": "+t.slice(0,200));});
       return r.json();
@@ -467,47 +195,48 @@ function runActor(actorId,input){
     });
 }
 
-function buscarResultados(){
+function buscar(){
   resultados=[];
-  document.getElementById("res-log").innerHTML="";
-  document.getElementById("res-lista").innerHTML="";
-  var estado=document.getElementById("res-estado");
+  document.getElementById("log").innerHTML="";
+  document.getElementById("lista").innerHTML="";
+  document.getElementById("barra-orden").className="hidden";
+  var estado=document.getElementById("estado");
   estado.className="empty";
-  estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando en portales...</p><p style="font-size:12px">Apify puede tardar 30–90 segundos</p>';
-  var btn=document.getElementById("btnBuscarRes");
+  estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando...</p><p style="font-size:12px;color:#a0aec0">Puede tardar 30–90 segundos</p>';
+  var btn=document.getElementById("btnBuscar");
   btn.disabled=true;btn.textContent="⏳ Buscando...";
 
-  if(urlsActuales.length===0)urlsActuales=buildUrls();
-  function getUrl(id){for(var i=0;i<urlsActuales.length;i++)if(urlsActuales[i].id===id)return urlsActuales[i].url;return"";}
-  var asUrl=getUrl("autoscout"), wpUrl=getUrl("wallapop"), cnUrl=getUrl("cochesnet");
+  var urls=buildUrls();
 
-  var p1=runActor("ivanvs~autoscout-scraper",{startUrls:[asUrl],maxItems:20})
+  var p1=runActor("ivanvs~autoscout-scraper",{startUrls:[urls.autoscout],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:it.price||it.priceValue||0,km:it.mileage||it.km||0,ano:it.year||it.firstRegistrationYear||0,portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||asUrl,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
+        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:it.price||it.priceValue||0,km:it.mileage||it.km||0,ano:it.year||it.firstRegistrationYear||0,portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||urls.autoscout,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
       });
     }).catch(function(e){addLog("❌ AutoScout24: "+e.message);});
 
-  var p2=runActor("fayoussef~wallapop-scraper",{startUrls:[wpUrl],maxItems:20})
+  var p2=runActor("fayoussef~wallapop-scraper",{startUrls:[urls.wallapop],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||it.name||"Sin título",precio:it.price||it.salePrice||0,km:it.km||it.mileage||0,ano:it.year||0,portal:"Wallapop",color:"#13c1ac",url:it.url||it.itemUrl||wpUrl,descripcion:it.description?it.description.slice(0,80)+"...":"",imagen:it.image||it.thumbnail||(it.images&&it.images[0])||null});
+        resultados.push({titulo:it.title||it.name||"Sin título",precio:it.price||it.salePrice||0,km:it.km||it.mileage||0,ano:it.year||0,portal:"Wallapop",color:"#13c1ac",url:it.url||it.itemUrl||urls.wallapop,descripcion:it.description?it.description.slice(0,80)+"...":"",imagen:it.image||it.thumbnail||(it.images&&it.images[0])||null});
       });
     }).catch(function(e){addLog("❌ Wallapop: "+e.message);});
 
-  var p3=runActor("ivanvs~coches-net-scraper",{startUrls:[cnUrl],maxItems:20})
+  var p3=runActor("ivanvs~coches-net-scraper",{startUrls:[urls.cochesnet],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:it.price||0,km:it.mileage||it.km||0,ano:it.year||0,portal:"Coches.net",color:"#1a6fb5",url:it.url||cnUrl,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
+        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:it.price||0,km:it.mileage||it.km||0,ano:it.year||0,portal:"Coches.net",color:"#1a6fb5",url:it.url||urls.cochesnet,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
       });
     }).catch(function(e){addLog("❌ Coches.net: "+e.message);});
 
   Promise.all([p1,p2,p3]).then(function(){
-    btn.disabled=false;btn.textContent=resultados.length>0?"🔄 Actualizar":"🔎 Buscar resultados";
+    btn.disabled=false;btn.textContent="🔎 Buscar";
     if(resultados.length===0){
+      estado.className="empty";
       estado.innerHTML='<div style="font-size:36px">😕</div><p style="font-weight:600;color:#c53030">Sin resultados. Revisa el log de abajo.</p>';
     }else{
       estado.className="hidden";
+      document.getElementById("barra-orden").className="";
       renderResultados();
     }
   });
@@ -542,28 +271,17 @@ function renderResultados(){
       +'<span style="font-size:11px;color:#a0aec0">Ver →</span></div></div></a>';
   }
   if(arr.length>0)html+='<p style="text-align:center;font-size:11px;color:#a0aec0;margin-top:8px">'+arr.length+' resultados</p>';
-  document.getElementById("res-lista").innerHTML=html;
+  document.getElementById("lista").innerHTML=html;
 }
 
-function renderHistorial(){
-  if(historial.length===0)return;
-  var html="";
-  for(var i=0;i<historial.length;i++){
-    var h=historial[i];
-    html+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
-      +'<p style="font-weight:700;font-size:14px">'+h.titulo+'</p>'
-      +'<span style="font-size:11px;color:#a0aec0;background:#f7f9fc;padding:2px 8px;border-radius:6px">'+h.fecha+'</span></div><div>';
-    for(var j=0;j<h.urls.length;j++){
-      html+='<a class="hist-pill" style="background:'+h.urls[j].color+'" href="'+h.urls[j].url+'" target="_blank" rel="noreferrer">'+h.urls[j].name+'</a>';
-    }
-    html+='</div></div>';
+// INIT
+(function(){
+  var sel=document.getElementById("selMarca");
+  for(var i=0;i<MARCAS.length;i++){
+    var o=document.createElement("option");o.textContent=MARCAS[i];sel.appendChild(o);
   }
-  document.getElementById("hist-lista").innerHTML=html;
-}
-
-// ====== INIT ======
-renderMarcas();
-renderChips();
+  onMarca();
+})();
 </script>
 </body>
 </html>
