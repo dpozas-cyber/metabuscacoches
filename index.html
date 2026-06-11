@@ -216,7 +216,7 @@ function buscar(){
   var p1=runActor("ivanvs~autoscout-scraper",{urls:[{url:urls.autoscout}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:it.price||it.priceValue||0,km:it.mileage||it.km||0,ano:it.year||it.firstRegistrationYear||0,portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||urls.autoscout,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
+        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:parsePrecio(it.price||it.priceValue||it.priceRaw),km:parsePrecio(it.mileage||it.km),ano:sanitizaAno(it.year||it.firstRegistrationYear),portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||urls.autoscout,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
       });
     }).catch(function(e){addLog("❌ AutoScout24: "+e.message);});
 
@@ -230,7 +230,7 @@ function buscar(){
   var p3=runActor("ivanvs~coches-net-scraper",{urls:[{url:urls.cochesnet}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:it.price||0,km:it.mileage||it.km||0,ano:it.year||0,portal:"Coches.net",color:"#1a6fb5",url:it.url||urls.cochesnet,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
+        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:parsePrecio(it.price||(it.priceInfo&&it.priceInfo.amount)),km:parsePrecio(it.mileage||it.km),ano:sanitizaAno(it.year),portal:"Coches.net",color:"#1a6fb5",url:it.url||urls.cochesnet,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
       });
     }).catch(function(e){addLog("❌ Coches.net: "+e.message);});
 
@@ -290,7 +290,7 @@ function agregarMilanuncios(){
         var anoM=c.textContent.match(/\b(19|20)\d{2}\b/);
         var href=aEl.getAttribute("href")||"";
         if(href.indexOf("http")!==0)href="https://www.milanuncios.com"+href;
-        resultados.push({titulo:tEl.textContent.trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:anoM?parseInt(anoM[0],10):0,portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+        resultados.push({titulo:tEl.textContent.trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:sanitizaAno(anoM?anoM[0]:0),portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
       });
       var nuevos=resultados.length-antes;
       addLog("📦 Milanuncios: "+nuevos+" resultados"+(nuevos===0?" (parseo falló o anti-bot)":""));
@@ -340,9 +340,30 @@ function agregarTheParking(){
     });
 }
 
+// Extrae un precio numérico de un número o texto tipo "€ 4.500,-" o "4500 EUR"
+function parsePrecio(v){
+  if(typeof v==="number")return v;
+  if(!v)return 0;
+  var m=String(v).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);
+  return m?parseInt(m[1],10):0;
+}
+function sanitizaAno(a){
+  a=parseInt(a,10)||0;
+  return (a>=1950&&a<=2026)?a:0;
+}
+
 function renderResultados(){
   var orden=val("ordenRes");
-  var arr=resultados.slice().sort(function(a,b){
+  // Dedupe por URL y filtro de modelo en cliente
+  var modelo=(val("selModelo")||"").toLowerCase();
+  var vistos={};
+  var arr=resultados.filter(function(r){
+    if(vistos[r.url])return false;
+    vistos[r.url]=true;
+    if(modelo&&r.titulo.toLowerCase().replace(/[\s-]/g,"").indexOf(modelo.replace(/[\s-]/g,""))===-1)return false;
+    return true;
+  });
+  arr=arr.slice().sort(function(a,b){
     if(orden==="precio_asc")return a.precio-b.precio;
     if(orden==="precio_desc")return b.precio-a.precio;
     if(orden==="km_asc")return a.km-b.km;
