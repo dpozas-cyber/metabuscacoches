@@ -208,21 +208,21 @@ function buscar(){
 
   var urls=buildUrls();
 
-  var p1=runActor("ivanvs~autoscout-scraper",{startUrls:[urls.autoscout],maxItems:20})
+  var p1=runActor("ivanvs~autoscout-scraper",{urls:[urls.autoscout],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
         resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:it.price||it.priceValue||0,km:it.mileage||it.km||0,ano:it.year||it.firstRegistrationYear||0,portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||urls.autoscout,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
       });
     }).catch(function(e){addLog("❌ AutoScout24: "+e.message);});
 
-  var p2=runActor("fayoussef~wallapop-scraper",{startUrls:[urls.wallapop],maxItems:20})
+  var p2=runActor("fayoussef~wallapop-scraper",{start_urls:[urls.wallapop],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
         resultados.push({titulo:it.title||it.name||"Sin título",precio:it.price||it.salePrice||0,km:it.km||it.mileage||0,ano:it.year||0,portal:"Wallapop",color:"#13c1ac",url:it.url||it.itemUrl||urls.wallapop,descripcion:it.description?it.description.slice(0,80)+"...":"",imagen:it.image||it.thumbnail||(it.images&&it.images[0])||null});
       });
     }).catch(function(e){addLog("❌ Wallapop: "+e.message);});
 
-  var p3=runActor("ivanvs~coches-net-scraper",{startUrls:[urls.cochesnet],maxItems:20})
+  var p3=runActor("ivanvs~coches-net-scraper",{urls:[urls.cochesnet],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
         resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:it.price||0,km:it.mileage||it.km||0,ano:it.year||0,portal:"Coches.net",color:"#1a6fb5",url:it.url||urls.cochesnet,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
