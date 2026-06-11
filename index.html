@@ -481,14 +481,14 @@ function buscarResultados(){
   function getUrl(id){for(var i=0;i<urlsActuales.length;i++)if(urlsActuales[i].id===id)return urlsActuales[i].url;return"";}
   var asUrl=getUrl("autoscout"), wpUrl=getUrl("wallapop"), cnUrl=getUrl("cochesnet");
 
-  var p1=runActor("blackfalcondata~autoscout24-scraper",{startUrls:[asUrl],maxResults:20})
+  var p1=runActor("ivanvs~autoscout-scraper",{startUrls:[asUrl],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
         resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:it.price||it.priceValue||0,km:it.mileage||it.km||0,ano:it.year||it.firstRegistrationYear||0,portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||asUrl,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
       });
     }).catch(function(e){addLog("❌ AutoScout24: "+e.message);});
 
-  var p2=runActor("cptauad~wallapop-scraper",{startUrls:[wpUrl],maxItems:20})
+  var p2=runActor("fayoussef~wallapop-scraper",{startUrls:[wpUrl],maxItems:20})
     .then(function(items){
       (items||[]).slice(0,20).forEach(function(it){
         resultados.push({titulo:it.title||it.name||"Sin título",precio:it.price||it.salePrice||0,km:it.km||it.mileage||0,ano:it.year||0,portal:"Wallapop",color:"#13c1ac",url:it.url||it.itemUrl||wpUrl,descripcion:it.description?it.description.slice(0,80)+"...":"",imagen:it.image||it.thumbnail||(it.images&&it.images[0])||null});
