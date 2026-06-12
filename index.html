@@ -65,6 +65,7 @@ h1{font-size:19px;font-weight:700}
     </select>
     <div style="display:flex;gap:8px;margin-top:8px">
       <button class="extra-btn" id="btnMila" style="color:#e67e22;border-color:#e67e22" onclick="agregarMilanuncios()">➕ Milanuncios</button>
+      <a class="extra-btn" id="lnkWalla" style="color:#13c1ac;border-color:#13c1ac" href="#" target="_blank" rel="noreferrer">🔗 Wallapop</a>
       <a class="extra-btn" id="lnkPark" style="color:#e91e63;border-color:#e91e63" href="#" target="_blank" rel="noreferrer">🔗 The Parking</a>
       <a class="extra-btn" id="lnkCochesnet" style="color:#1a6fb5;border-color:#1a6fb5" href="#" target="_blank" rel="noreferrer">🔗 Coches.net</a>
     </div>
@@ -78,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VERSION = "v28";
+var VERSION = "v29";
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -172,6 +173,8 @@ function urlWallapop(endpoint){
   var modelo = val("selModelo")||"";
   var kw=(marca+" "+modelo).trim()||"coche";
   var q="keywords="+encodeURIComponent(kw)+"&latitude=40.4168&longitude=-3.7038&country_code=ES&order_by=most_relevance";
+  if(marca)q+="&brand="+encodeURIComponent(marca);
+  if(modelo)q+="&model="+encodeURIComponent(modelo);
   if(endpoint==="general")q+="&category_ids=100";
   if(val("precioMin"))q+="&min_sale_price="+val("precioMin");
   if(val("precioMax"))q+="&max_sale_price="+val("precioMax");
@@ -348,6 +351,17 @@ function buscar(){
   document.getElementById("barra-orden").className="hidden";
   document.getElementById("lnkCochesnet").href=urlCochesnet();
   document.getElementById("lnkPark").href=urlTheParking();
+  // Link a Wallapop web con filtros (fallback si la API no da resultados)
+  var ww="category_id=100&order_by=most_relevance";
+  var marcaW=val("selMarca")==="Cualquiera"?"":val("selMarca");
+  if(marcaW)ww+="&brand="+encodeURIComponent(marcaW);
+  if(val("selModelo"))ww+="&model="+encodeURIComponent(val("selModelo"));
+  if(val("precioMin"))ww+="&min_sale_price="+val("precioMin");
+  if(val("precioMax"))ww+="&max_sale_price="+val("precioMax");
+  if(val("anoMin"))ww+="&min_year="+val("anoMin");
+  if(val("anoMax"))ww+="&max_year="+val("anoMax");
+  if(val("kmMax"))ww+="&max_km="+val("kmMax");
+  document.getElementById("lnkWalla").href="https://es.wallapop.com/search?"+ww;
   var estado=document.getElementById("estado");
   estado.className="empty";
   estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando...</p><p style="font-size:12px;color:#a0aec0">Unos segundos</p>';
