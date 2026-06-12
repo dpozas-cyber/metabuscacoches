@@ -65,6 +65,7 @@ h1{font-size:19px;font-weight:700}
     </select>
     <div style="display:flex;gap:8px;margin-top:8px">
       <button class="extra-btn" id="btnMila" style="color:#e67e22;border-color:#e67e22" onclick="agregarMilanuncios()">➕ Milanuncios</button>
+      <button class="extra-btn" id="btnPark" style="color:#e91e63;border-color:#e91e63" onclick="agregarTheParking()">➕ The Parking</button>
       <a class="extra-btn" id="lnkCochesnet" style="color:#1a6fb5;border-color:#1a6fb5;text-align:center;text-decoration:none" href="#" target="_blank" rel="noreferrer">🔗 Coches.net</a>
     </div>
   </div>
@@ -77,7 +78,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VERSION = "v26";
+var VERSION = "v27";
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -171,13 +172,13 @@ function urlWallapopApi(){
   var modelo = val("selModelo")||"";
   var kw=(marca+" "+modelo).trim()||"coche";
   // Endpoint general con categoría coches (100): más fiable que /cars/search
-  var q="keywords="+encodeURIComponent(kw)+"&category_ids=100&latitude=40.4168&longitude=-3.7038&order_by=most_relevance";
+  var q="keywords="+encodeURIComponent(kw)+"&latitude=40.4168&longitude=-3.7038&distance=500000&order_by=most_relevance";
   if(val("precioMin"))q+="&min_sale_price="+val("precioMin");
   if(val("precioMax"))q+="&max_sale_price="+val("precioMax");
   if(val("anoMin"))q+="&min_year="+val("anoMin");
   if(val("anoMax"))q+="&max_year="+val("anoMax");
   if(val("kmMax"))q+="&max_km="+val("kmMax");
-  return "https://api.wallapop.com/api/v3/general/search?"+q;
+  return "https://api.wallapop.com/api/v3/cars/search?"+q;
 }
 function urlMilanuncios(){
   var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
@@ -305,6 +306,46 @@ function agregarMilanuncios(){
     .catch(function(e){
       addLog("❌ Milanuncios: "+e.message);
       btn.disabled=false;btn.textContent="➕ Milanuncios";
+    });
+}
+
+function agregarTheParking(){
+  var btn=document.getElementById("btnPark");
+  btn.disabled=true;btn.textContent="⏳ The Parking...";
+  addLog("🌐 The Parking...");
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var modelo = val("selModelo")||"";
+  var base = marca?(slug(marca)+(modelo?"-"+slug(modelo):"")):"coches";
+  var target="https://www.theparking.eu/used-cars/"+base+".html";
+  fetch(PROXY+"/"+target)
+    .then(function(r){return r.text();})
+    .then(function(html){
+      var doc=new DOMParser().parseFromString(html,"text/html");
+      var cards=doc.querySelectorAll('li[class*="annonce"], [class*="resultat"], [class*="car-card"], article');
+      var antes=resultados.length;
+      var pMin=parseInt(val("precioMin")||"0",10), pMax=parseInt(val("precioMax")||"99999999",10);
+      cards.forEach(function(c){
+        var aEl=c.querySelector('a[href*="/used-cars/"]')||c.querySelector("a");
+        var txt=c.textContent||"";
+        var pm=txt.replace(/[.\s\u00a0]/g,"").match(/(\d{3,7})€/);
+        if(!aEl||!pm)return;
+        var precio=parseInt(pm[1],10);
+        if(precio<pMin||precio>pMax)return;
+        var kmM=txt.match(/([\d.\s\u00a0]+)\s*km/i);
+        var anoM=txt.match(/\b(19|20)\d{2}\b/);
+        var tEl=c.querySelector("h2, h3, [class*=title]");
+        var href=aEl.getAttribute("href")||"";
+        if(href.indexOf("http")!==0)href="https://www.theparking.eu"+href;
+        resultados.push({titulo:(tEl?tEl.textContent:txt.slice(0,50)).trim().replace(/\s+/g," ").slice(0,70),precio:precio,km:kmM?parseInt(kmM[1].replace(/[.\s\u00a0]/g,""),10):0,ano:sanitizaAno(anoM?anoM[0]:0),portal:"The Parking",color:"#e91e63",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+      });
+      var nuevos=resultados.length-antes;
+      addLog("📦 The Parking: "+nuevos+" resultados"+(nuevos===0?" (parseo falló)":""));
+      btn.disabled=false;btn.textContent=nuevos>0?"✓ The Parking":"➕ The Parking";
+      if(nuevos>0)renderResultados();
+    })
+    .catch(function(e){
+      addLog("❌ The Parking: "+e.message);
+      btn.disabled=false;btn.textContent="➕ The Parking";
     });
 }
 
