@@ -17,7 +17,6 @@ h1{font-size:19px;font-weight:700}
 .inp{padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:14px;width:100%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.span2{grid-column:span 2}
 .btn-main{width:100%;padding:14px;background:linear-gradient(135deg,#1a6fb5,#2980b9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(26,111,181,0.35)}
 .btn-main:disabled{background:#a0aec0;cursor:not-allowed;box-shadow:none}
 .result{display:flex;align-items:stretch;border-radius:10px;border:1px solid #e2e8f0;background:#fff;margin-bottom:8px;text-decoration:none;overflow:hidden}
@@ -27,6 +26,7 @@ h1{font-size:19px;font-weight:700}
 .log p{font-size:11px;color:#e2e8f0;font-family:monospace;margin:2px 0;line-height:1.4}
 .hidden{display:none}
 .empty{text-align:center;padding:48px 0;color:#a0aec0}
+.extra-btn{flex:1;padding:8px;border-radius:8px;border:1px solid;background:#fff;font-size:13px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -35,7 +35,7 @@ h1{font-size:19px;font-weight:700}
     <div class="logo">🔍</div>
     <div>
       <h1>Metabuscador de coches</h1>
-      <p class="sub">AutoScout24 · Wallapop · Coches.net</p>
+      <p class="sub">AutoScout24 · Wallapop · Milanuncios — 100% gratuito</p>
     </div>
   </div>
 
@@ -55,7 +55,7 @@ h1{font-size:19px;font-weight:700}
     <button class="btn-main" id="btnBuscar" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
   </div>
 
-  <!-- ORDEN -->
+  <!-- ORDEN Y EXTRAS -->
   <div id="barra-orden" class="hidden" style="margin-bottom:12px">
     <select class="inp" id="ordenRes" onchange="renderResultados()">
       <option value="precio_asc">💰 Precio: menor primero</option>
@@ -64,8 +64,8 @@ h1{font-size:19px;font-weight:700}
       <option value="ano_desc">📅 Más nuevos primero</option>
     </select>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="inp" id="btnMila" style="cursor:pointer;font-weight:600;color:#e67e22;border-color:#e67e22" onclick="agregarMilanuncios()">➕ Milanuncios</button>
-      <button class="inp" id="btnPark" style="cursor:pointer;font-weight:600;color:#e91e63;border-color:#e91e63" onclick="agregarTheParking()">➕ The Parking</button>
+      <button class="extra-btn" id="btnMila" style="color:#e67e22;border-color:#e67e22" onclick="agregarMilanuncios()">➕ Milanuncios</button>
+      <a class="extra-btn" id="lnkCochesnet" style="color:#1a6fb5;border-color:#1a6fb5;text-align:center;text-decoration:none" href="#" target="_blank" rel="noreferrer">🔗 Coches.net</a>
     </div>
   </div>
 
@@ -120,13 +120,19 @@ var MM = {
 "Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"]
 };
 var MARCAS = Object.keys(MM);
-var APIFY_TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
-var PROXY = "https://metabuscador.dpozas.workers.dev";
 var MARCA_IDS = {"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
+var PROXY = "https://metabuscador.dpozas.workers.dev";
 var resultados = [];
 
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function val(id){return document.getElementById(id).value;}
+function parsePrecio(v){
+  if(typeof v==="number")return Math.round(v);
+  if(!v)return 0;
+  var m=String(v).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);
+  return m?parseInt(m[1],10):0;
+}
+function sanitizaAno(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
 
 function onMarca(){
   var m=val("selMarca");
@@ -139,40 +145,6 @@ function onMarca(){
   sel.disabled = m==="Cualquiera";
 }
 
-function buildUrls(){
-  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
-  var modelo = val("selModelo")||"";
-  var pMin=val("precioMin"), pMax=val("precioMax");
-  var aMin=val("anoMin"), aMax=val("anoMax");
-  var km=val("kmMax");
-  var mSlug = marca?slug(marca):"", moSlug = modelo?slug(modelo):"";
-  var mId = marca?(MARCA_IDS[marca]||""):"";
-
-  // AutoScout24
-  var as="atype=C&ustate=N,U&cy=E&desc=0&sort=standard";
-  if(pMin)as+="&pricefrom="+pMin; if(pMax)as+="&priceto="+pMax;
-  if(aMin)as+="&fregfrom="+aMin; if(aMax)as+="&fregto="+aMax;
-  if(km)as+="&kmto="+km;
-  var asUrl="https://www.autoscout24.es"+(marca?("/lst/"+mSlug+(moSlug?"/"+moSlug:"")):"/lst")+"?"+as;
-
-  // Wallapop
-  var wp="category_id=100&order_by=most_relevance";
-  if(marca)wp+="&brand="+encodeURIComponent(marca); if(modelo)wp+="&model="+encodeURIComponent(modelo);
-  if(pMin)wp+="&min_sale_price="+pMin; if(pMax)wp+="&max_sale_price="+pMax;
-  if(km)wp+="&max_km="+km; if(aMin)wp+="&min_year="+aMin; if(aMax)wp+="&max_year="+aMax;
-  var wpUrl="https://es.wallapop.com/search?"+wp;
-
-  // Coches.net
-  var cn="";
-  if(mId)cn+="MakeIds[0]="+mId;
-  if(pMin)cn+=(cn?"&":"")+"MinPrice="+pMin; if(pMax)cn+=(cn?"&":"")+"MaxPrice="+pMax;
-  if(aMin)cn+=(cn?"&":"")+"MinYear="+aMin; if(aMax)cn+=(cn?"&":"")+"MaxYear="+aMax;
-  if(km)cn+=(cn?"&":"")+"MaxKms="+km;
-  var cnUrl="https://www.coches.net/search/"+(cn?"?"+cn:"");
-
-  return {autoscout:asUrl, wallapop:wpUrl, cochesnet:cnUrl};
-}
-
 function addLog(msg){
   var log=document.getElementById("log");
   log.className="log";
@@ -181,73 +153,31 @@ function addLog(msg){
   log.appendChild(p);
 }
 
-function runActor(actorId,input){
-  addLog("🚀 Lanzando "+actorId+"...");
-  var apifyUrl="https://api.apify.com/v2/acts/"+actorId+"/run-sync-get-dataset-items?token="+APIFY_TOKEN+"&timeout=120&memory=1024";
-  return fetch(apifyUrl,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(input)
-  })
-    .then(function(r){
-      if(!r.ok)return r.text().then(function(t){throw new Error("HTTP "+r.status+": "+t.slice(0,200));});
-      return r.json();
-    })
-    .then(function(data){
-      var arr=Array.isArray(data)?data:[];
-      addLog("📦 "+actorId+": "+arr.length+" resultados");
-      return arr;
-    });
+// ====== URLs ======
+function urlAutoscout(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var modelo = val("selModelo")||"";
+  var q="atype=C&ustate=N,U&cy=E&desc=0&sort=standard&size=20";
+  if(val("precioMin"))q+="&pricefrom="+val("precioMin");
+  if(val("precioMax"))q+="&priceto="+val("precioMax");
+  if(val("anoMin"))q+="&fregfrom="+val("anoMin");
+  if(val("anoMax"))q+="&fregto="+val("anoMax");
+  if(val("kmMax"))q+="&kmto="+val("kmMax");
+  return "https://www.autoscout24.es"+(marca?("/lst/"+slug(marca)+(modelo?"/"+slug(modelo):"")):"/lst")+"?"+q;
 }
-
-function buscar(){
-  resultados=[];
-  document.getElementById("log").innerHTML="";
-  document.getElementById("lista").innerHTML="";
-  document.getElementById("barra-orden").className="hidden";
-  var estado=document.getElementById("estado");
-  estado.className="empty";
-  estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando...</p><p style="font-size:12px;color:#a0aec0">Puede tardar 30–90 segundos</p>';
-  var btn=document.getElementById("btnBuscar");
-  btn.disabled=true;btn.textContent="⏳ Buscando...";
-
-  var urls=buildUrls();
-
-  var p1=runActor("ivanvs~autoscout-scraper",{urls:[{url:urls.autoscout}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(items){
-      (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título",precio:parsePrecio(it.price||it.priceValue||it.priceRaw),km:parsePrecio(it.mileage||it.km),ano:sanitizaAno(it.year||it.firstRegistrationYear),portal:"AutoScout24",color:"#f47920",url:it.url||it.listingUrl||urls.autoscout,descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", "),imagen:(it.images&&it.images[0])||it.imageUrl||null});
-      });
-    }).catch(function(e){addLog("❌ AutoScout24: "+e.message);});
-
-  var p2=runActor("fayoussef~wallapop-scraper",{start_urls:[{url:urls.wallapop}],maxItems:20})
-    .then(function(items){
-      (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||it.name||"Sin título",precio:it.price||it.salePrice||0,km:it.km||it.mileage||0,ano:it.year||0,portal:"Wallapop",color:"#13c1ac",url:it.url||it.itemUrl||urls.wallapop,descripcion:it.description?it.description.slice(0,80)+"...":"",imagen:it.image||it.thumbnail||(it.images&&it.images[0])||null});
-      });
-    }).catch(function(e){addLog("❌ Wallapop: "+e.message);});
-
-  var p3=runActor("ivanvs~coches-net-scraper",{urls:[{url:urls.cochesnet}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(items){
-      (items||[]).slice(0,20).forEach(function(it){
-        resultados.push({titulo:it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título",precio:parsePrecio(it.price||(it.priceInfo&&it.priceInfo.amount)),km:parsePrecio(it.mileage||it.km),ano:sanitizaAno(it.year),portal:"Coches.net",color:"#1a6fb5",url:it.url||urls.cochesnet,descripcion:[it.fuelType,it.transmission].filter(Boolean).join(", "),imagen:it.image||(it.images&&it.images[0])||null});
-      });
-    }).catch(function(e){addLog("❌ Coches.net: "+e.message);});
-
-  Promise.all([p1,p2,p3]).then(function(){
-    btn.disabled=false;btn.textContent="🔎 Buscar";
-    if(resultados.length===0){
-      estado.className="empty";
-      estado.innerHTML='<div style="font-size:36px">😕</div><p style="font-weight:600;color:#c53030">Sin resultados. Revisa el log de abajo.</p>';
-    }else{
-      estado.className="hidden";
-      document.getElementById("barra-orden").className="";
-      renderResultados();
-    }
-  });
+function urlWallapopApi(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var modelo = val("selModelo")||"";
+  var kw=(marca+" "+modelo).trim()||"coche";
+  // lat/lng de Madrid: sin coordenadas la API busca en medio del Atlántico y devuelve vacío
+  var q="keywords="+encodeURIComponent(kw)+"&latitude=40.4168&longitude=-3.7038&distance=500000&order_by=most_relevance";
+  if(val("precioMin"))q+="&min_sale_price="+val("precioMin");
+  if(val("precioMax"))q+="&max_sale_price="+val("precioMax");
+  if(val("anoMin"))q+="&min_year="+val("anoMin");
+  if(val("anoMax"))q+="&max_year="+val("anoMax");
+  if(val("kmMax"))q+="&max_km="+val("kmMax");
+  return "https://api.wallapop.com/api/v3/cars/search?"+q;
 }
-
-// ====== PORTALES EXTRA (via Worker proxy + parseo HTML) ======
 function urlMilanuncios(){
   var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
   var mId = marca?(MARCA_IDS[marca]||""):"";
@@ -260,20 +190,84 @@ function urlMilanuncios(){
   if(val("kmMax"))q+="&kilometersTo="+val("kmMax");
   return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;
 }
-
-function urlTheParking(){
+function urlCochesnet(){
   var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
-  var modelo = val("selModelo")||"";
-  var base = marca?(slug(marca)+(modelo?"-"+slug(modelo):"")):"coches";
-  return "https://www.theparking.eu/used-cars/"+base+".html";
+  var mId = marca?(MARCA_IDS[marca]||""):"";
+  var q="";
+  if(mId)q+="MakeIds[0]="+mId;
+  if(val("precioMin"))q+=(q?"&":"")+"MinPrice="+val("precioMin");
+  if(val("precioMax"))q+=(q?"&":"")+"MaxPrice="+val("precioMax");
+  if(val("anoMin"))q+=(q?"&":"")+"MinYear="+val("anoMin");
+  if(val("anoMax"))q+=(q?"&":"")+"MaxYear="+val("anoMax");
+  if(val("kmMax"))q+=(q?"&":"")+"MaxKms="+val("kmMax");
+  return "https://www.coches.net/search/"+(q?"?"+q:"");
+}
+
+// ====== PARSERS ======
+function buscarAutoscout(){
+  addLog("🌐 AutoScout24...");
+  return fetch(PROXY+"/"+urlAutoscout())
+    .then(function(r){return r.text();})
+    .then(function(html){
+      var doc=new DOMParser().parseFromString(html,"text/html");
+      var cards=doc.querySelectorAll("article");
+      var n=0;
+      cards.forEach(function(c){
+        var aEl=c.querySelector("a[href]");
+        if(!aEl)return;
+        var href=aEl.getAttribute("href")||"";
+        if(href.indexOf("/anuncios")===-1&&href.indexOf("/offers")===-1)return;
+        if(href.indexOf("http")!==0)href="https://www.autoscout24.es"+href;
+        var txt=c.textContent||"";
+        // Atributos data-* si existen (más fiables)
+        var precio=parsePrecio(c.getAttribute("data-price"))||0;
+        if(!precio){var pm=txt.replace(/[.\s\u00a0]/g,"").match(/(\d{3,7})€/);if(pm)precio=parseInt(pm[1],10);}
+        var km=parsePrecio(c.getAttribute("data-mileage"))||0;
+        if(!km){var kmM=txt.match(/([\d.\u00a0\s]+)\s*km/i);if(kmM)km=parseInt(kmM[1].replace(/[.\s\u00a0]/g,""),10)||0;}
+        var ano=0;
+        var regM=txt.match(/(0[1-9]|1[0-2])\/((19|20)\d{2})/);
+        if(regM)ano=parseInt(regM[2],10);
+        if(!ano){var fr=c.getAttribute("data-first-registration");if(fr){var frM=String(fr).match(/(19|20)\d{2}/);if(frM)ano=parseInt(frM[0],10);}}
+        var tEl=c.querySelector("h2, h3");
+        resultados.push({titulo:(tEl?tEl.textContent:txt.slice(0,50)).trim().slice(0,70),precio:precio,km:km,ano:sanitizaAno(ano),portal:"AutoScout24",color:"#f47920",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+        n++;
+      });
+      addLog("📦 AutoScout24: "+n+" resultados");
+    })
+    .catch(function(e){addLog("❌ AutoScout24: "+e.message);});
+}
+
+function buscarWallapop(){
+  addLog("🌐 Wallapop API...");
+  return fetch(PROXY+"/"+urlWallapopApi())
+    .then(function(r){return r.json();})
+    .then(function(json){
+      var items=json.search_objects||[];
+      var n=0;
+      items.slice(0,20).forEach(function(raw){
+        var it=raw.content||raw;
+        var titulo=it.title||it.name||"Sin título";
+        var precio=parsePrecio(it.price&&it.price.amount!==undefined?it.price.amount:it.price);
+        var km=parsePrecio(it.km||it.mileage);
+        var ano=sanitizaAno(it.year);
+        var slugW=it.web_slug||it.slug||"";
+        var href=slugW?("https://es.wallapop.com/item/"+slugW):"https://es.wallapop.com";
+        var img=null;
+        if(it.images&&it.images[0])img=it.images[0].small||it.images[0].medium||it.images[0].original||null;
+        if(!img&&it.image)img=it.image.small||it.image.original||null;
+        resultados.push({titulo:titulo.slice(0,70),precio:precio,km:km,ano:ano,portal:"Wallapop",color:"#13c1ac",url:href,descripcion:(it.description||"").slice(0,80),imagen:img});
+        n++;
+      });
+      addLog("📦 Wallapop: "+n+" resultados");
+    })
+    .catch(function(e){addLog("❌ Wallapop: "+e.message);});
 }
 
 function agregarMilanuncios(){
   var btn=document.getElementById("btnMila");
   btn.disabled=true;btn.textContent="⏳ Milanuncios...";
-  var target=urlMilanuncios();
-  addLog("🌐 Descargando Milanuncios via Worker...");
-  fetch(PROXY+"/"+target)
+  addLog("🌐 Milanuncios...");
+  fetch(PROXY+"/"+urlMilanuncios())
     .then(function(r){return r.text();})
     .then(function(html){
       var doc=new DOMParser().parseFromString(html,"text/html");
@@ -284,17 +278,16 @@ function agregarMilanuncios(){
         var pEl=c.querySelector('[class*="Price"], [class*="price"]');
         var aEl=c.querySelector('a[href*="/"]');
         if(!tEl||!aEl)return;
-        var precio=0;
-        if(pEl){var pm=pEl.textContent.replace(/[.\s]/g,"").match(/(\d+)/);if(pm)precio=parseInt(pm[1],10);}
-        var kmM=c.textContent.match(/([\d.]+)\s*kms?/i);
-        var anoM=c.textContent.match(/\b(19|20)\d{2}\b/);
+        var precio=pEl?parsePrecio(pEl.textContent):0;
+        var kmM=(c.textContent||"").match(/([\d.]+)\s*kms?/i);
+        var anoM=(c.textContent||"").match(/\b(19|20)\d{2}\b/);
         var href=aEl.getAttribute("href")||"";
         if(href.indexOf("http")!==0)href="https://www.milanuncios.com"+href;
-        resultados.push({titulo:tEl.textContent.trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:sanitizaAno(anoM?anoM[0]:0),portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+        resultados.push({titulo:tEl.textContent.trim().slice(0,70),precio:precio,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:sanitizaAno(anoM?anoM[0]:0),portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
       });
       var nuevos=resultados.length-antes;
-      addLog("📦 Milanuncios: "+nuevos+" resultados"+(nuevos===0?" (parseo falló o anti-bot)":""));
-      btn.disabled=false;btn.textContent=nuevos>0?"✓ Milanuncios ("+nuevos+")":"➕ Milanuncios";
+      addLog("📦 Milanuncios: "+nuevos+" resultados"+(nuevos===0?" (anti-bot o cambio de diseño)":""));
+      btn.disabled=false;btn.textContent=nuevos>0?"✓ Milanuncios":"➕ Milanuncios";
       if(nuevos>0)renderResultados();
     })
     .catch(function(e){
@@ -303,58 +296,37 @@ function agregarMilanuncios(){
     });
 }
 
-function agregarTheParking(){
-  var btn=document.getElementById("btnPark");
-  btn.disabled=true;btn.textContent="⏳ The Parking...";
-  var target=urlTheParking();
-  addLog("🌐 Descargando The Parking via Worker...");
-  fetch(PROXY+"/"+target)
-    .then(function(r){return r.text();})
-    .then(function(html){
-      var doc=new DOMParser().parseFromString(html,"text/html");
-      var cards=doc.querySelectorAll('li[class*="annonce"], [class*="resultat"], [class*="car-card"], article');
-      var antes=resultados.length;
-      var pMin=parseInt(val("precioMin")||"0",10), pMax=parseInt(val("precioMax")||"99999999",10);
-      cards.forEach(function(c){
-        var aEl=c.querySelector('a[href*="/used-cars/"], a[href*="/coches/"]')||c.querySelector("a");
-        var txt=c.textContent||"";
-        var pm=txt.replace(/[.\s\u00a0]/g,"").match(/(\d{3,7})€/);
-        if(!aEl||!pm)return;
-        var precio=parseInt(pm[1],10);
-        if(precio<pMin||precio>pMax)return; // The Parking no filtra en servidor: filtramos aquí
-        var kmM=txt.match(/([\d.\s\u00a0]+)\s*km/i);
-        var anoM=txt.match(/\b(19|20)\d{2}\b/);
-        var tEl=c.querySelector("h2, h3, [class*=title]");
-        var href=aEl.getAttribute("href")||"";
-        if(href.indexOf("http")!==0)href="https://www.theparking.eu"+href;
-        resultados.push({titulo:(tEl?tEl.textContent:txt.slice(0,50)).trim().slice(0,60),precio:precio,km:kmM?parseInt(kmM[1].replace(/[.\s\u00a0]/g,""),10):0,ano:anoM?parseInt(anoM[0],10):0,portal:"The Parking",color:"#e91e63",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
-      });
-      var nuevos=resultados.length-antes;
-      addLog("📦 The Parking: "+nuevos+" resultados"+(nuevos===0?" (parseo falló o anti-bot)":""));
-      btn.disabled=false;btn.textContent=nuevos>0?"✓ The Parking ("+nuevos+")":"➕ The Parking";
-      if(nuevos>0)renderResultados();
-    })
-    .catch(function(e){
-      addLog("❌ The Parking: "+e.message);
-      btn.disabled=false;btn.textContent="➕ The Parking";
-    });
+// ====== BUSCAR ======
+function buscar(){
+  resultados=[];
+  document.getElementById("log").innerHTML="";
+  document.getElementById("lista").innerHTML="";
+  document.getElementById("barra-orden").className="hidden";
+  document.getElementById("lnkCochesnet").href=urlCochesnet();
+  var estado=document.getElementById("estado");
+  estado.className="empty";
+  estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando...</p><p style="font-size:12px;color:#a0aec0">Unos segundos</p>';
+  var btn=document.getElementById("btnBuscar");
+  btn.disabled=true;btn.textContent="⏳ Buscando...";
+
+  Promise.all([buscarAutoscout(),buscarWallapop()]).then(function(){
+    btn.disabled=false;btn.textContent="🔎 Buscar";
+    document.getElementById("barra-orden").className="";
+    document.getElementById("btnMila").textContent="➕ Milanuncios";
+    document.getElementById("btnMila").disabled=false;
+    if(resultados.length===0){
+      estado.className="empty";
+      estado.innerHTML='<div style="font-size:36px">😕</div><p style="font-weight:600;color:#c53030">Sin resultados. Revisa el log de abajo.</p>';
+    }else{
+      estado.className="hidden";
+      renderResultados();
+    }
+  });
 }
 
-// Extrae un precio numérico de un número o texto tipo "€ 4.500,-" o "4500 EUR"
-function parsePrecio(v){
-  if(typeof v==="number")return v;
-  if(!v)return 0;
-  var m=String(v).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);
-  return m?parseInt(m[1],10):0;
-}
-function sanitizaAno(a){
-  a=parseInt(a,10)||0;
-  return (a>=1950&&a<=2026)?a:0;
-}
-
+// ====== RENDER ======
 function renderResultados(){
   var orden=val("ordenRes");
-  // Dedupe por URL y filtro de modelo en cliente
   var modelo=(val("selModelo")||"").toLowerCase();
   var vistos={};
   var arr=resultados.filter(function(r){
@@ -362,8 +334,7 @@ function renderResultados(){
     vistos[r.url]=true;
     if(modelo&&r.titulo.toLowerCase().replace(/[\s-]/g,"").indexOf(modelo.replace(/[\s-]/g,""))===-1)return false;
     return true;
-  });
-  arr=arr.slice().sort(function(a,b){
+  }).sort(function(a,b){
     if(orden==="precio_asc")return a.precio-b.precio;
     if(orden==="precio_desc")return b.precio-a.precio;
     if(orden==="km_asc")return a.km-b.km;
