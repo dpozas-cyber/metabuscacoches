@@ -35,7 +35,7 @@ h1{font-size:19px;font-weight:700}
     <div class="logo">🔍</div>
     <div>
       <h1>Metabuscador de coches</h1>
-      <p class="sub">AutoScout24 · Wallapop · Milanuncios — 100% gratuito</p>
+      <p class="sub">AutoScout24 · Wallapop · Milanuncios — 100% gratuito · <b id="version"></b></p>
     </div>
   </div>
 
@@ -77,6 +77,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
+var VERSION = "v25";
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -378,6 +379,7 @@ function renderResultados(){
 
 // INIT
 (function(){
+  document.getElementById("version").textContent=VERSION;
   var sel=document.getElementById("selMarca");
   for(var i=0;i<MARCAS.length;i++){
     var o=document.createElement("option");o.textContent=MARCAS[i];sel.appendChild(o);
