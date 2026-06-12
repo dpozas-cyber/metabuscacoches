@@ -211,6 +211,11 @@ function buscarAutoscout(){
     .then(function(html){
       var doc=new DOMParser().parseFromString(html,"text/html");
       var cards=doc.querySelectorAll("article");
+      addLog("🔬 AutoScout: HTML "+html.length+" chars, "+cards.length+" <article>, "+doc.querySelectorAll("a").length+" links");
+      if(cards.length>0){
+        var a0=cards[0].querySelector("a[href]");
+        addLog("🔬 Primer article link: "+(a0?a0.getAttribute("href").slice(0,80):"sin link"));
+      }
       var n=0;
       cards.forEach(function(c){
         var aEl=c.querySelector("a[href]");
@@ -240,9 +245,16 @@ function buscarAutoscout(){
 function buscarWallapop(){
   addLog("🌐 Wallapop API...");
   return fetch(PROXY+"/"+urlWallapopApi())
-    .then(function(r){return r.json();})
-    .then(function(json){
-      var items=json.search_objects||[];
+    .then(function(r){return r.text();})
+    .then(function(txt){
+      var json;
+      try{json=JSON.parse(txt);}catch(e){
+        addLog("🔬 Wallapop no devolvió JSON. Primeros 150 chars: "+txt.slice(0,150));
+        return;
+      }
+      addLog("🔬 Wallapop JSON keys: "+Object.keys(json).join(", "));
+      var items=json.search_objects||(json.data&&json.data.section&&json.data.section.payload&&json.data.section.payload.items)||[];
+      addLog("🔬 Wallapop items: "+items.length);
       var n=0;
       items.slice(0,20).forEach(function(raw){
         var it=raw.content||raw;
