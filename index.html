@@ -77,7 +77,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VERSION = "v25";
+var VERSION = "v26";
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -170,14 +170,14 @@ function urlWallapopApi(){
   var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
   var modelo = val("selModelo")||"";
   var kw=(marca+" "+modelo).trim()||"coche";
-  // lat/lng de Madrid: sin coordenadas la API busca en medio del Atlántico y devuelve vacío
-  var q="keywords="+encodeURIComponent(kw)+"&latitude=40.4168&longitude=-3.7038&distance=500000&order_by=most_relevance";
+  // Endpoint general con categoría coches (100): más fiable que /cars/search
+  var q="keywords="+encodeURIComponent(kw)+"&category_ids=100&latitude=40.4168&longitude=-3.7038&order_by=most_relevance";
   if(val("precioMin"))q+="&min_sale_price="+val("precioMin");
   if(val("precioMax"))q+="&max_sale_price="+val("precioMax");
   if(val("anoMin"))q+="&min_year="+val("anoMin");
   if(val("anoMax"))q+="&max_year="+val("anoMax");
   if(val("kmMax"))q+="&max_km="+val("kmMax");
-  return "https://api.wallapop.com/api/v3/cars/search?"+q;
+  return "https://api.wallapop.com/api/v3/general/search?"+q;
 }
 function urlMilanuncios(){
   var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
@@ -210,32 +210,31 @@ function buscarAutoscout(){
   return fetch(PROXY+"/"+urlAutoscout())
     .then(function(r){return r.text();})
     .then(function(html){
+      // AutoScout24 es Next.js: los anuncios van en el JSON __NEXT_DATA__
       var doc=new DOMParser().parseFromString(html,"text/html");
-      var cards=doc.querySelectorAll("article");
-      addLog("🔬 AutoScout: HTML "+html.length+" chars, "+cards.length+" <article>, "+doc.querySelectorAll("a").length+" links");
-      if(cards.length>0){
-        var a0=cards[0].querySelector("a[href]");
-        addLog("🔬 Primer article link: "+(a0?a0.getAttribute("href").slice(0,80):"sin link"));
-      }
+      var script=doc.getElementById("__NEXT_DATA__");
+      if(!script){addLog("🔬 AutoScout: no hay __NEXT_DATA__");return;}
+      var j;
+      try{j=JSON.parse(script.textContent);}catch(e){addLog("🔬 AutoScout: JSON inválido");return;}
+      var pp=(j.props&&j.props.pageProps)||{};
+      var lst=pp.listings||pp.results||[];
+      if(!lst.length){addLog("🔬 AutoScout pageProps keys: "+Object.keys(pp).join(", ").slice(0,150));return;}
       var n=0;
-      cards.forEach(function(c){
-        var aEl=c.querySelector("a[href]");
-        if(!aEl)return;
-        var href=aEl.getAttribute("href")||"";
-        if(href.indexOf("/anuncios")===-1&&href.indexOf("/offers")===-1)return;
-        if(href.indexOf("http")!==0)href="https://www.autoscout24.es"+href;
-        var txt=c.textContent||"";
-        // Atributos data-* si existen (más fiables)
-        var precio=parsePrecio(c.getAttribute("data-price"))||0;
-        if(!precio){var pm=txt.replace(/[.\s\u00a0]/g,"").match(/(\d{3,7})€/);if(pm)precio=parseInt(pm[1],10);}
-        var km=parsePrecio(c.getAttribute("data-mileage"))||0;
-        if(!km){var kmM=txt.match(/([\d.\u00a0\s]+)\s*km/i);if(kmM)km=parseInt(kmM[1].replace(/[.\s\u00a0]/g,""),10)||0;}
+      lst.slice(0,20).forEach(function(l){
+        var href=l.url||"";
+        if(href&&href.indexOf("http")!==0)href="https://www.autoscout24.es"+href;
+        var v=l.vehicle||{};
+        var titulo=((v.make||"")+" "+(v.model||"")+" "+(v.modelVersionInput||"")).trim()||"Sin título";
+        var tr=l.tracking||{};
+        var precio=parsePrecio(tr.price||(l.price&&(l.price.priceFormatted||l.price.raw||l.price)));
+        var km=parsePrecio(tr.mileage||(l.vehicleDetails&&l.vehicleDetails[0]&&l.vehicleDetails[0].data));
         var ano=0;
-        var regM=txt.match(/(0[1-9]|1[0-2])\/((19|20)\d{2})/);
-        if(regM)ano=parseInt(regM[2],10);
-        if(!ano){var fr=c.getAttribute("data-first-registration");if(fr){var frM=String(fr).match(/(19|20)\d{2}/);if(frM)ano=parseInt(frM[0],10);}}
-        var tEl=c.querySelector("h2, h3");
-        resultados.push({titulo:(tEl?tEl.textContent:txt.slice(0,50)).trim().slice(0,70),precio:precio,km:km,ano:sanitizaAno(ano),portal:"AutoScout24",color:"#f47920",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null});
+        var fr=String(tr.firstRegistration||"");
+        var frM=fr.match(/(19|20)\d{2}/);
+        if(frM)ano=parseInt(frM[0],10);
+        var img=null;
+        if(l.images&&l.images[0])img=typeof l.images[0]==="string"?l.images[0]:(l.images[0].url||null);
+        resultados.push({titulo:titulo.slice(0,70),precio:precio,km:km,ano:sanitizaAno(ano),portal:"AutoScout24",color:"#f47920",url:href||urlAutoscout(),descripcion:"",imagen:img});
         n++;
       });
       addLog("📦 AutoScout24: "+n+" resultados");
