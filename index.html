@@ -74,7 +74,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v33";
+var VER="v34";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -159,15 +159,31 @@ function actor(id,input){
   });
 }
 
+// Extrae precio de número, string u objeto {amount,...} / {value,...} / {gross,...}
+function precioDe(it){
+  var p=it.price;
+  if(p&&typeof p==="object"){
+    p=p.amount||p.value||p.gross||p.gross_amount||p.consumerPriceGross||p.priceRaw||p.raw||0;
+  }
+  return pp(p||it.rawPrice||it.priceValue||it.netPrice||0);
+}
+function kmDe(it){return pp(it.milage||it.mileage||it.km||(it.properties&&it.properties.mileage)||0);}
+function anoDe(it){
+  var a=it.year||it.firstRegistrationYear;
+  if(!a&&it.firstRegistration)a=(String(it.firstRegistration).match(/(19|20)\d{2}/)||[])[0];
+  if(!a&&it.attributes){var fr=it.attributes.year||it.attributes.firstRegistration;if(fr)a=(String(fr).match(/(19|20)\d{2}/)||[])[0];}
+  return ay(a);
+}
+
 function push(it,portal,color,fallbackUrl){
   res.push({
-    titulo:(it.title||((it.make||"")+" "+(it.model||"")+" "+(it.year||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
-    precio:pp(it.price||it.priceValue||it.priceRaw||(it.priceInfo&&it.priceInfo.amount)||(it.price&&it.price.amount)),
-    km:pp(it.mileage||it.km),
-    ano:ay(it.year||it.firstRegistrationYear||(String(it.firstRegistration||"").match(/(19|20)\d{2}/)||[])[0]),
+    titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
+    precio:precioDe(it),
+    km:kmDe(it),
+    ano:anoDe(it),
     portal:portal,color:color,
     url:it.url||it.listingUrl||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:fallbackUrl),
-    descripcion:[it.fuelType,it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
+    descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
     imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||null
   });
 }
