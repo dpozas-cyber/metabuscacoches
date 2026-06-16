@@ -74,7 +74,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v38";
+var VER="v39";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -189,7 +189,7 @@ function push(it,portal,color,fallbackUrl){
     portal:portal,color:color,
     url:it.url||it.listingUrl||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:fallbackUrl),
     descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
-    imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||null
+    imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null
   });
 }
 
@@ -201,7 +201,7 @@ function bAS(){
 }
 function bWP(){
   return actor("rastriq~wallapop-cars-scraper",{startUrls:[{url:uWP()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 WP keys: "+Object.keys(d[0]).join(",").slice(0,200));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
+    .then(function(d){d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
     .catch(function(e){log("❌ Wallapop: "+e.message);});
 }
 function bCN(){
