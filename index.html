@@ -74,7 +74,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v35";
+var VER="v36";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -163,11 +163,16 @@ function actor(id,input){
 function precioDe(it){
   var p=it.price;
   if(p&&typeof p==="object"){
-    p=p.amount||p.value||p.gross||p.gross_amount||p.consumerPriceGross||p.priceRaw||p.raw||0;
+    p=p.price||p.amount||p.value||p.gross||p.gross_amount||p.consumerPriceGross||p.priceRaw||p.raw||0;
   }
   return pp(p||it.rawPrice||it.priceValue||it.netPrice||0);
 }
-function kmDe(it){return pp(it.milage||it.mileage||it.km||(it.properties&&it.properties.mileage)||0);}
+function kmDe(it){
+  var k=it.milage||it.mileage||it.km;
+  if(!k&&it.attributes)k=it.attributes.km||it.attributes.mileage;
+  if(!k&&it.properties)k=it.properties.mileage;
+  return pp(k||0);
+}
 function anoDe(it){
   var a=it.year||it.firstRegistrationYear;
   if(!a&&it.firstRegistration)a=(String(it.firstRegistration).match(/(19|20)\d{2}/)||[])[0];
@@ -191,7 +196,7 @@ function push(it,portal,color,fallbackUrl){
 // ====== Portales ======
 function bAS(){
   return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 AS keys: "+Object.keys(d[0]).join(",").slice(0,200));d.slice(0,20).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});})
+    .then(function(d){d.slice(0,20).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});})
     .catch(function(e){log("❌ AutoScout24: "+e.message);});
 }
 function bWP(){
@@ -201,14 +206,14 @@ function bWP(){
 }
 function bCN(){
   return actor("ivanvs~coches-net-scraper",{urls:[{url:uCN()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 CN price="+JSON.stringify(d[0].price).slice(0,120)+" attr="+JSON.stringify(d[0].attributes).slice(0,120));d.slice(0,20).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});})
+    .then(function(d){d.slice(0,20).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});})
     .catch(function(e){log("❌ Coches.net: "+e.message);});
 }
 function bMD(){
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca");
   if(m&&!MDID[m]){log("ℹ️ mobile.de: "+m+" sin ID, omitido");return Promise.resolve();}
   return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 MD keys: "+Object.keys(d[0]).join(",").slice(0,200));d.slice(0,20).forEach(function(it){push(it,"mobile.de 🇩🇪","#f5a623",uMD());});})
+    .then(function(d){d.slice(0,20).forEach(function(it){push(it,"mobile.de 🇩🇪","#f5a623",uMD());});})
     .catch(function(e){log("❌ mobile.de: "+e.message);});
 }
 
