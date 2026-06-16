@@ -200,7 +200,7 @@ function bAS(){
     .catch(function(e){log("❌ AutoScout24: "+e.message);});
 }
 function bWP(){
-  return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:20})
+  return actor("rastriq~wallapop-cars-scraper",{startUrls:[{url:uWP()}],maxItems:20})
     .then(function(d){if(d[0])log("🔬 WP keys: "+Object.keys(d[0]).join(",").slice(0,200));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
     .catch(function(e){log("❌ Wallapop: "+e.message);});
 }
