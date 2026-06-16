@@ -77,7 +77,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VERSION = "v31";
+var VERSION = "v32";
 var MM = {
 "Cualquiera":[],
 "Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito","GTV","Spider"],
@@ -285,8 +285,42 @@ function buscarCochesnetApify(){
     }).catch(function(e){addLog("❌ Coches.net: "+e.message);});
 }
 
-// The Parking via apify/web-scraper (renderiza el JS de la página)
-function buscarTheParkingApify(){
+// ====== MOBILE.DE (Alemania/Europa) ======
+// IDs de marca de mobile.de (las más habituales; si falta alguna se busca sin marca)
+var MOBILE_IDS={"Alfa Romeo":"140","Audi":"1900","BMW":"3500","Citroën":"5900","Dacia":"6600","Fiat":"8600","Ford":"9000","Honda":"11000","Hyundai":"11600","Jaguar":"12100","Jeep":"12400","Kia":"13200","Land Rover":"14600","Lexus":"15200","Mazda":"16800","Mercedes":"17200","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19800","Porsche":"20000","Renault":"20700","Seat":"22500","Skoda":"22900","Smart":"23000","Subaru":"23500","Suzuki":"23600","Toyota":"24100","Volvo":"25100","Volkswagen":"25200","Tesla":"135"};
+function urlMobile(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  var mId = marca?(MOBILE_IDS[marca]||""):"";
+  var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";
+  if(mId)q+="&ms="+mId+"%3B%3B%3B";
+  var pMin=val("precioMin"), pMax=val("precioMax");
+  if(pMin||pMax)q+="&p="+(pMin||"")+"%3A"+(pMax||"");
+  var aMin=val("anoMin"), aMax=val("anoMax");
+  if(aMin||aMax)q+="&fr="+(aMin||"")+"%3A"+(aMax||"");
+  if(val("kmMax"))q+="&ml=%3A"+val("kmMax");
+  return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;
+}
+function buscarMobileApify(){
+  var marca = val("selMarca")==="Cualquiera" ? "" : val("selMarca");
+  if(marca&&!MOBILE_IDS[marca]){addLog("ℹ️ mobile.de: marca "+marca+" sin ID, se omite");return Promise.resolve();}
+  return runActor("ivanvs~mobile-de-scraper",{urls:[{url:urlMobile()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
+    .then(function(items){
+      (items||[]).slice(0,20).forEach(function(it){
+        resultados.push({
+          titulo:(it.title||((it.make||"")+" "+(it.model||"")).trim()||"Sin título").slice(0,70),
+          precio:parsePrecio(it.price||it.priceValue),
+          km:parsePrecio(it.mileage||it.km),
+          ano:sanitizaAno(it.year||it.firstRegistrationYear||(String(it.firstRegistration||"").match(/(19|20)\d{2}/)||[])[0]),
+          portal:"mobile.de",color:"#f5a623",
+          url:it.url||it.listingUrl||urlMobile(),
+          descripcion:[it.fuelType,it.transmission,"🇩🇪 Alemania"].filter(Boolean).join(", "),
+          imagen:(it.images&&it.images[0])||it.imageUrl||null
+        });
+      });
+    }).catch(function(e){addLog("❌ mobile.de: "+e.message);});
+}
+
+// The Parking via apify/web-scraper (renderiza el JS de la página)function buscarTheParkingApify(){
   var pageFn="async function pageFunction(context){"
     +"const $=context.jQuery;await context.waitFor(4000);const out=[];"
     +"$('li,article,div').each(function(){"
