@@ -74,7 +74,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v34";
+var VER="v35";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -201,7 +201,7 @@ function bWP(){
 }
 function bCN(){
   return actor("ivanvs~coches-net-scraper",{urls:[{url:uCN()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 CN keys: "+Object.keys(d[0]).join(",").slice(0,200));d.slice(0,20).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});})
+    .then(function(d){if(d[0])log("🔬 CN price="+JSON.stringify(d[0].price).slice(0,120)+" attr="+JSON.stringify(d[0].attributes).slice(0,120));d.slice(0,20).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});})
     .catch(function(e){log("❌ Coches.net: "+e.message);});
 }
 function bMD(){
