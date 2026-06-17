@@ -185,7 +185,7 @@ function matchModelo(r,mo){
 }
 
 function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
-function bWP(){return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 WP precio: "+JSON.stringify(d[0]).slice(1200,1800));d.slice(0,40).forEach(function(it){
+function bWP(){return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 WP keys: "+Object.keys(d[0]).join(", "));if(d[1])log("🔬 WP[1] precio campos: price="+d[1].price+" sale_price="+d[1].sale_price+" salePrice="+d[1].salePrice+" price_amount="+d[1].price_amount+" cost="+d[1].cost);d.slice(0,40).forEach(function(it){
   var precio=it.sale_price||it.price_amount||it.salePrice||it.price||0;
   var url=it.listing_url||it.share_url||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:uWP());
   var img=(it.images&&it.images[0])||it.imageUrl||null;
