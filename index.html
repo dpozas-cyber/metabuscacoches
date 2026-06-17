@@ -75,10 +75,11 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v41";
+var VER="v42";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
+var MDKEY={};
 
 var MM={"Cualquiera":[],
 "Abarth":["595","595 Competizione","695","124 Spider","500e"],
@@ -141,10 +142,66 @@ function ay(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
 function log(msg){var el=document.getElementById("log");el.className="log";var p=document.createElement("p");p.textContent=new Date().toLocaleTimeString()+": "+msg;el.appendChild(p);}
 
 function onMarca(){
-  var m=v("selMarca"),sel=document.getElementById("selModelo");
-  sel.innerHTML="<option value=''>Cualquiera</option>";
-  (MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
-  sel.disabled=m==="Cualquiera";
+  var sel=document.getElementById("selModelo");
+  sel.innerHTML="<option value=''>Cargando modelos...</option>";
+  sel.disabled=true;
+  var m=v("selMarca");
+  if(m==="Cualquiera"){sel.innerHTML="<option value=''>Cualquiera</option>";return;}
+  var key=MDKEY[m];
+  if(!key){
+    // marca sin key de mobile.de: usa la lista estática si existe
+    sel.innerHTML="<option value=''>Cualquiera</option>";
+    (MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
+    sel.disabled=false;return;
+  }
+  // Carga modelos desde mobile.de
+  fetch(PROXY+"/https://services.mobile.de/refdata/classes/Car/makes/"+encodeURIComponent(key)+"/models")
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var items=(j.reference&&j.reference.item)||[];
+      sel.innerHTML="<option value=''>Cualquiera</option>";
+      var nombres=[];
+      items.forEach(function(it){
+        var nom=it["local-description"]&&it["local-description"]["$"];
+        if(nom&&nombres.indexOf(nom)===-1){nombres.push(nom);}
+      });
+      nombres.sort();
+      nombres.forEach(function(nom){var o=document.createElement("option");o.textContent=nom;sel.appendChild(o);});
+      sel.disabled=false;
+      if(nombres.length===0&&MM[m]){(MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});}
+    })
+    .catch(function(){
+      // si falla, usa lista estática
+      sel.innerHTML="<option value=''>Cualquiera</option>";
+      (MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
+      sel.disabled=false;
+    });
+}
+
+function cargarMarcas(){
+  var sel=document.getElementById("selMarca");
+  fetch(PROXY+"/https://services.mobile.de/refdata/classes/Car/makes")
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var items=(j.reference&&j.reference.item)||[];
+      MDKEY={};
+      var nombres=[];
+      items.forEach(function(it){
+        var nom=it["local-description"]&&it["local-description"]["$"];
+        var key=it["@key"];
+        if(nom&&key&&nom!=="Otros"){MDKEY[nom]=key;nombres.push(nom);}
+      });
+      nombres.sort();
+      sel.innerHTML="<option>Cualquiera</option>";
+      nombres.forEach(function(nom){var o=document.createElement("option");o.textContent=nom;sel.appendChild(o);});
+      log("✓ "+nombres.length+" marcas cargadas de mobile.de");
+    })
+    .catch(function(){
+      // fallback: marcas estáticas
+      sel.innerHTML="";
+      MARCAS.forEach(function(m){var o=document.createElement("option");o.textContent=m;sel.appendChild(o);});
+      onMarca();
+    });
 }
 
 // ====== URL builders ======
@@ -174,9 +231,9 @@ function uCN(){
   return "https://www.coches.net/search/"+(q?"?"+q:"");
 }
 function uMD(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MDID[m]||""):"";
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";
   var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";
-  if(mId)q+="&ms="+mId+"%3B%3B%3B";
+  if(key)q+="&mk="+encodeURIComponent(key);
   if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");
   if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");
   if(v("kmMax"))q+="&ml=%3A"+v("kmMax");
@@ -261,7 +318,7 @@ function bCN(){
 }
 function bMD(){
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca");
-  if(m&&!MDID[m]){log("ℹ️ mobile.de: "+m+" sin ID, omitido");return Promise.resolve();}
+  if(m&&!MDKEY[m]){log("ℹ️ mobile.de: "+m+" sin ref, omitido");return Promise.resolve();}
   return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
     .then(function(d){d.slice(0,20).forEach(function(it){push(it,"mobile.de 🇩🇪","#f5a623",uMD());});})
     .catch(function(e){log("❌ mobile.de: "+e.message);});
@@ -357,9 +414,7 @@ function render(){
 // INIT
 (function(){
   document.getElementById("ver").textContent=VER;
-  var sel=document.getElementById("selMarca");
-  MARCAS.forEach(function(m){var o=document.createElement("option");o.textContent=m;sel.appendChild(o);});
-  onMarca();
+  cargarMarcas();
 })();
 </script>
 </body>
