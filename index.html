@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v46";
+var VER="v47";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -307,16 +307,18 @@ function bAS(){
     .then(function(d){d.slice(0,20).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});})
     .catch(function(e){log("❌ AutoScout24: "+e.message);});
 }
-function bWP(){
+function uWP(){
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
-  var kw=(m+" "+mo).trim()||"coche";
-  var input={keywords:kw,maxItems:20,proxyConfiguration:{useApifyProxy:true,apifyProxyGroups:["RESIDENTIAL"],apifyProxyCountry:"ES"}};
-  if(v("pMin"))input.minPrice=parseInt(v("pMin"),10);
-  if(v("pMax"))input.maxPrice=parseInt(v("pMax"),10);
-  if(v("aMin"))input.minYear=parseInt(v("aMin"),10);
-  if(v("aMax"))input.maxYear=parseInt(v("aMax"),10);
-  if(v("kmMax"))input.maxKm=parseInt(v("kmMax"),10);
-  return actor("rastriq~wallapop-cars-scraper",input)
+  var kw=(m+" "+mo).trim();
+  var q="category_id=100&order_by=most_relevance";
+  if(kw)q+="&keywords="+encodeURIComponent(kw);
+  if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");
+  if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");
+  if(v("kmMax"))q+="&max_km="+v("kmMax");
+  return "https://es.wallapop.com/search?"+q;
+}
+function bWP(){
+  return actor("fayoussef~wallapop-scraper",{startUrls:[{url:uWP()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
     .then(function(d){if(d[0])log("🔬 WP1: "+(d[0].title||((d[0].brand||"")+" "+(d[0].model||""))));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
     .catch(function(e){log("❌ Wallapop: "+e.message);});
 }
