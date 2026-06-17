@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v45";
+var VER="v46";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -308,8 +308,16 @@ function bAS(){
     .catch(function(e){log("❌ AutoScout24: "+e.message);});
 }
 function bWP(){
-  return actor("rastriq~wallapop-cars-scraper",{startUrls:[{url:uWP()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
-    .then(function(d){if(d[0])log("🔬 WP1: "+(d[0].title||d[0].brand+" "+d[0].model));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
+  var kw=(m+" "+mo).trim()||"coche";
+  var input={keywords:kw,maxItems:20,proxyConfiguration:{useApifyProxy:true,apifyProxyGroups:["RESIDENTIAL"],apifyProxyCountry:"ES"}};
+  if(v("pMin"))input.minPrice=parseInt(v("pMin"),10);
+  if(v("pMax"))input.maxPrice=parseInt(v("pMax"),10);
+  if(v("aMin"))input.minYear=parseInt(v("aMin"),10);
+  if(v("aMax"))input.maxYear=parseInt(v("aMax"),10);
+  if(v("kmMax"))input.maxKm=parseInt(v("kmMax"),10);
+  return actor("rastriq~wallapop-cars-scraper",input)
+    .then(function(d){if(d[0])log("🔬 WP1: "+(d[0].title||((d[0].brand||"")+" "+(d[0].model||""))));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
     .catch(function(e){log("❌ Wallapop: "+e.message);});
 }
 function bCN(){
