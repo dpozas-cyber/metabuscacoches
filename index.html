@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v42";
+var VER="v43";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -216,7 +216,7 @@ function uAS(){
 function uWP(){
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
   var q="category_id=100&order_by=most_relevance";
-  if(m)q+="&brand="+encodeURIComponent(m);if(mo)q+="&model="+encodeURIComponent(mo);
+  if(m)q+="&brand="+encodeURIComponent(m.toUpperCase());if(mo)q+="&model="+encodeURIComponent(mo);
   if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");
   if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");
   if(v("kmMax"))q+="&max_km="+v("kmMax");
