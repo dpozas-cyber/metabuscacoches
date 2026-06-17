@@ -74,12 +74,60 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v39";
+var VER="v40";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
 
-var MM={"Cualquiera":[],"Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Mito"],"Audi":["A1","A2","A3","A3 Sportback","A4","A4 Avant","A5","A5 Sportback","A6","A6 Avant","A7","A8","Q2","Q3","Q3 Sportback","Q4 e-tron","Q5","Q5 Sportback","Q7","Q8","R8","RS3","RS4","RS5","RS6","S3","S4","S5","TT","E-tron"],"BMW":["116i","118i","118d","120i","120d","M135i","320i","320d","330i","330d","M3","420i","420d","M4","520i","520d","530i","530d","M5","X1","X2","X3","X4","X5","X6","Z4","i3","i4","iX"],"Citroën":["C1","C2","C3","C3 Aircross","C4","C4 Cactus","C5","C5 Aircross","Berlingo"],"Cupra":["Ateca","Born","Formentor","Leon","Tavascan"],"Dacia":["Duster","Jogger","Logan","Sandero","Spring"],"Fiat":["500","500C","500e","500X","Panda","Punto","Tipo"],"Ford":["Fiesta","Fiesta ST","Focus","Focus ST","Kuga","Mondeo","Mustang","Mustang Mach-E","Puma","Ranger","S-Max"],"Honda":["Civic","Civic Type R","CR-V","HR-V","Jazz","e"],"Hyundai":["i10","i20","i30","i30 N","Ioniq 5","Ioniq 6","Kona","Santa Fe","Tucson"],"Jaguar":["E-Pace","F-Pace","F-Type","I-Pace","XE","XF"],"Jeep":["Cherokee","Compass","Grand Cherokee","Renegade","Wrangler"],"Kia":["Ceed","EV6","EV9","Niro","Picanto","Sportage","Stinger","Xceed"],"Land Rover":["Defender 90","Defender 110","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport"],"Lexus":["CT 200h","IS 300h","NX 300h","RX 450h","UX 250h"],"Mazda":["2","3","6","CX-3","CX-30","CX-5","MX-5"],"Mercedes":["A 180","A 200","A 220","C 180","C 200","C 220 d","C 300","C 63 AMG","CLA 200","E 200","E 220 d","GLA 200","GLC 200","GLC 220 d","GLE 300 d","S 400","S 500"],"MG":["3","4","5","HS","ZS","ZS EV"],"Mini":["Cooper","Cooper S","Cabrio","Clubman","Countryman","JCW"],"Mitsubishi":["ASX","Eclipse Cross","Outlander","Pajero"],"Nissan":["Juke","Leaf","Micra","Qashqai","X-Trail"],"Opel":["Astra","Corsa","Grandland","Insignia","Mokka"],"Peugeot":["208","2008","308","3008","408","508","5008"],"Porsche":["911 Carrera","Cayenne","Macan","Panamera","Taycan"],"Renault":["Captur","Clio","Kadjar","Megane","Scenic","Twingo","Zoe"],"Seat":["Arona","Ateca","Ibiza","Ibiza FR","Leon","Leon FR","Tarraco"],"Skoda":["Enyaq iV 80","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Superb"],"Smart":["EQ ForTwo","ForTwo"],"Subaru":["BRZ","Forester","Impreza","Outback","WRX STI"],"Suzuki":["Ignis","Jimny","S-Cross","Swift","Vitara"],"Tesla":["Model 3","Model S","Model X","Model Y"],"Toyota":["Aygo","C-HR","Corolla","GR Yaris","Land Cruiser","Prius","RAV4","Yaris"],"Volkswagen":["Arteon","Golf","Golf GTI","Golf R","ID.3","ID.4","ID.5","Passat","Polo","T-Cross","T-Roc","Tiguan","Touareg","Up"],"Volvo":["C40 Recharge","EX30","EX40","S60","V60","V90","XC40","XC60","XC90"]};
+var MM={"Cualquiera":[],
+"Abarth":["595","595 Competizione","695","124 Spider","500e"],
+"Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","Junior","147","156","159","166","Brera","Mito","GT","GTV","Spider","4C"],
+"Alpine":["A110","A290"],
+"Aston Martin":["DB11","DB12","DBS","DBX","Vantage","Vanquish","Rapide"],
+"Audi":["A1","A1 Sportback","A2","A3","A3 Sportback","A4","A4 Avant","A4 Allroad","A5","A5 Sportback","A6","A6 Avant","A6 Allroad","A7","A8","Q2","Q3","Q3 Sportback","Q4 e-tron","Q5","Q5 Sportback","Q6 e-tron","Q7","Q8","Q8 e-tron","R8","RS3","RS4","RS5","RS6","RS7","RS Q3","RS Q8","RS e-tron GT","S1","S3","S4","S5","S6","S7","S8","SQ5","SQ7","SQ8","TT","TT RS","TTS","e-tron","e-tron GT"],
+"Bentley":["Bentayga","Continental GT","Flying Spur"],
+"BMW":["Serie 1","116i","118i","118d","120i","120d","M135i","Serie 2","218i","220i","220d","M240i","Serie 3","318d","320i","320d","330i","330d","330e","M340i","M3","Serie 4","420i","420d","430i","440i","M4","Serie 5","520i","520d","530i","530d","530e","540i","M5","Serie 6","Serie 7","730d","740i","750i","Serie 8","840i","M8","X1","X2","X3","X3 M","X4","X4 M","X5","X5 M","X6","X6 M","X7","XM","Z4","i3","i4","i5","i7","iX","iX1","iX2","iX3"],
+"Citroën":["C1","C2","C3","C3 Aircross","C3 Picasso","C4","C4 Cactus","C4 Picasso","C4 X","C5","C5 Aircross","C5 X","C6","C8","Berlingo","DS3","Grand C4 Picasso","Jumpy","Nemo","ë-C4"],
+"Cupra":["Ateca","Born","Formentor","Leon","Tavascan","Terramar"],
+"Dacia":["Dokker","Duster","Jogger","Lodgy","Logan","Sandero","Sandero Stepway","Spring"],
+"DS":["DS3","DS3 Crossback","DS4","DS5","DS7","DS7 Crossback","DS9"],
+"Ferrari":["296 GTB","458 Italia","488 GTB","812 Superfast","F8 Tributo","California","Portofino","Roma","SF90 Stradale","Purosangue","Daytona SP3"],
+"Fiat":["500","500C","500e","500L","500X","600","Bravo","Doblo","Freemont","Grande Punto","Panda","Panda 4x4","Punto","Qubo","Tipo","Tipo SW","Ulysse"],
+"Ford":["B-Max","C-Max","EcoSport","Edge","Explorer","Fiesta","Fiesta ST","Focus","Focus ST","Focus RS","Galaxy","Ka","Kuga","Kuga PHEV","Mondeo","Mustang","Mustang Mach-E","Puma","Puma ST","Ranger","Ranger Raptor","S-Max","Tourneo","Transit","Transit Custom"],
+"Honda":["Accord","Civic","Civic Type R","CR-V","CR-Z","HR-V","Insight","Jazz","Legend","NSX","ZR-V","e","e:Ny1"],
+"Hyundai":["i10","i20","i20 N","i30","i30 N","i30 Fastback","i40","ix20","ix35","Bayon","Ioniq","Ioniq 5","Ioniq 5 N","Ioniq 6","Kona","Kona Electric","Kona N","Nexo","Santa Fe","Tucson","Tucson PHEV"],
+"Infiniti":["Q30","Q50","Q60","QX30","QX50","QX70"],
+"Jaguar":["E-Pace","F-Pace","F-Pace SVR","F-Type","F-Type R","I-Pace","XE","XF","XJ","XK"],
+"Jeep":["Avenger","Cherokee","Commander","Compass","Compass 4xe","Grand Cherokee","Renegade","Renegade 4xe","Wrangler","Wrangler 4xe"],
+"Kia":["Carens","Ceed","Ceed GT","cee'd","EV6","EV6 GT","EV9","Niro","Niro EV","Optima","Picanto","ProCeed","Rio","Sorento","Soul","Sportage","Sportage PHEV","Stinger","Stonic","Venga","Xceed"],
+"Lamborghini":["Aventador","Gallardo","Huracán","Urus","Revuelto"],
+"Lancia":["Delta","Musa","Ypsilon"],
+"Land Rover":["Defender","Defender 90","Defender 110","Discovery","Discovery Sport","Freelander","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],
+"Lexus":["CT 200h","ES 300h","IS 300h","LC 500","LS 500h","NX 300h","NX 350h","NX 450h+","RC 300h","RX 450h","RX 500h","UX 250h","UX 300e"],
+"Maserati":["Ghibli","GranTurismo","GranCabrio","Grecale","Levante","MC20","Quattroporte"],
+"Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","CX-80","MX-5","MX-30","RX-8"],
+"McLaren":["540C","570S","600LT","720S","750S","Artura","GT"],
+"Mercedes":["Clase A","A 180","A 200","A 220","A 250","A 35 AMG","A 45 AMG","Clase B","B 180","B 200","Clase C","C 180","C 200","C 220 d","C 300","C 43 AMG","C 63 AMG","Clase E","E 200","E 220 d","E 300","E 53 AMG","E 63 AMG","Clase S","S 350 d","S 400","S 500","S 580","S 63 AMG","CLA","CLA 200","CLA 220 d","CLA 35 AMG","CLA 45 AMG","CLE","CLS","CLS 350","GLA","GLA 200","GLA 35 AMG","GLB","GLB 200","GLC","GLC 200","GLC 220 d","GLC 300","GLC 43 AMG","GLE","GLE 300 d","GLE 350","GLE 53 AMG","GLS","GLS 400 d","Clase G","G 500","G 63 AMG","EQA","EQB","EQC","EQE","EQS","EQV","SL","SL 500","SLC","AMG GT","Citan","Vito","Clase V","V 220 d","V 300 d"],
+"MG":["3","4","5","HS","HS PHEV","Marvel R","MG3 Hybrid","ZS","ZS EV","Cyberster"],
+"Mini":["Cooper","Cooper S","Cooper SE","Cabrio","Clubman","Clubman JCW","Countryman","Countryman JCW","JCW","One","Paceman","Roadster"],
+"Mitsubishi":["ASX","Eclipse Cross","L200","Lancer","Montero","Outlander","Outlander PHEV","Pajero","Space Star"],
+"Nissan":["350Z","370Z","Ariya","GT-R","Juke","Leaf","Micra","Murano","Navara","Note","NV200","Pulsar","Qashqai","Townstar","X-Trail"],
+"Opel":["Adam","Astra","Astra Electric","Combo","Corsa","Corsa-e","Crossland","Grandland","Insignia","Karl","Meriva","Mokka","Mokka-e","Vivaro","Zafira"],
+"Peugeot":["108","208","208 e","2008","2008 e","3008","3008 Hybrid","301","308","308 GTi","308 SW","408","408 PHEV","5008","508","508 PHEV","Partner","Rifter","RCZ","Traveller"],
+"Polestar":["1","2","3","4"],
+"Porsche":["718 Boxster","718 Cayman","718 Cayman GT4","911 Carrera","911 Carrera S","911 GT3","911 GT3 RS","911 Turbo","911 Turbo S","Cayenne","Cayenne E-Hybrid","Cayenne GTS","Cayenne Turbo","Macan","Macan S","Macan Turbo","Macan EV","Panamera","Taycan","Taycan 4S","Taycan Turbo"],
+"Renault":["Arkana","Austral","Captur","Clio","Clio E-Tech","Clio RS","Espace","Kadjar","Kangoo","Koleos","Laguna","Megane","Megane RS","Megane E-Tech","Modus","Scenic","Scenic E-Tech","Talisman","Twingo","Twizy","Zoe"],
+"Rolls-Royce":["Cullinan","Ghost","Phantom","Spectre","Wraith"],
+"Seat":["Alhambra","Arona","Ateca","Exeo","Ibiza","Ibiza FR","Leon","Leon FR","Leon Cupra","Mii","Tarraco","Toledo"],
+"Skoda":["Citigo","Enyaq","Enyaq iV 80","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Octavia RS","Rapid","Roomster","Scala","Superb","Yeti"],
+"Smart":["#1","#3","ForTwo","ForFour","EQ ForTwo","EQ ForFour","Roadster"],
+"SsangYong":["Korando","Musso","Rexton","Tivoli","Torres","XLV"],
+"Subaru":["BRZ","Forester","Impreza","Legacy","Levorg","Outback","Solterra","WRX STI","XV"],
+"Suzuki":["Across","Baleno","Celerio","Grand Vitara","Ignis","Jimny","S-Cross","Swift","Swift Sport","SX4 S-Cross","Vitara"],
+"Tesla":["Model 3","Model 3 Long Range","Model 3 Performance","Model S","Model S Plaid","Model X","Model Y","Model Y Long Range","Model Y Performance","Cybertruck","Roadster"],
+"Toyota":["Auris","Aygo","Aygo X","bZ4X","C-HR","C-HR Hybrid","Camry","Corolla","Corolla GR","Corolla Touring Sports","GR86","GR Supra","GR Yaris","Hilux","Land Cruiser","Mirai","Prius","Proace","RAV4","RAV4 Hybrid","RAV4 PHEV","Verso","Yaris","Yaris Cross","Yaris GR"],
+"Volkswagen":["Amarok","Arteon","Beetle","Caddy","Golf","Golf GTI","Golf GTD","Golf GTE","Golf R","Golf Variant","ID.3","ID.4","ID.4 GTX","ID.5","ID.7","ID. Buzz","Multivan","Passat","Passat GTE","Passat Variant","Polo","Polo GTI","Scirocco","Sharan","T-Cross","T-Roc","T-Roc R","Taigo","Tiguan","Tiguan Allspace","Touareg","Touran","Up"],
+"Volvo":["C30","C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"]};
 var MARCAS=Object.keys(MM);
 var MID={"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Land Rover":"27","Lexus":"28","Mazda":"33","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 var MDID={"Audi":"1900","BMW":"3500","Citroën":"5900","Dacia":"6600","Fiat":"8600","Ford":"9000","Honda":"11000","Hyundai":"11600","Jaguar":"12100","Jeep":"12400","Kia":"13200","Land Rover":"14600","Lexus":"15200","Mazda":"16800","Mercedes":"17200","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19800","Porsche":"20000","Renault":"20700","Seat":"22500","Skoda":"22900","Smart":"23000","Subaru":"23500","Suzuki":"23600","Toyota":"24100","Volvo":"25100","Volkswagen":"25200","Tesla":"135","Alfa Romeo":"140"};
