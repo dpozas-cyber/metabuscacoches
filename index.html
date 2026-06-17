@@ -90,7 +90,7 @@ function modelo(){return (v("txtModelo")||"").trim()||v("selModelo")||"";}
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function pp(val){if(typeof val==="number")return Math.round(val);if(!val)return 0;var m=String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
 function ay(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
-function log(msg){var el=document.getElementById("log");el.className="log";var p=document.createElement("p");p.textContent=new Date().toLocaleTimeString()+": "+msg;el.appendChild(p);}
+function log(msg){var el=document.getElementById("log");el.className="log";el.style.display="block";var p=document.createElement("p");p.textContent=new Date().toLocaleTimeString()+": "+msg;el.appendChild(p);}
 
 function onMarca(){
   var sel=document.getElementById("selModelo");
@@ -185,7 +185,7 @@ function matchModelo(r,mo){
 }
 
 function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
-function bWP(){return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 WP: "+JSON.stringify(d[0]).slice(0,200));d.slice(0,40).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});}).catch(function(e){log("❌ Wallapop: "+e.message);});}
+function bWP(){return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 WP: "+JSON.stringify(d[0]).slice(0,1200));d.slice(0,40).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});}).catch(function(e){log("❌ Wallapop: "+e.message);});}
 function bCN(){return actor("ivanvs~coches-net-scraper",{urls:[{url:uCN()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});}).catch(function(e){log("❌ Coches.net: "+e.message);});}
 function bMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca");if(m&&!MDKEY[m]){log("ℹ️ mobile.de: "+m+" sin ref, omitido");return Promise.resolve();}return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"mobile.de 🇩🇪","#f5a623",uMD());});}).catch(function(e){log("❌ mobile.de: "+e.message);});}
 
