@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v47";
+var VER="v48";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -318,7 +318,7 @@ function uWP(){
   return "https://es.wallapop.com/search?"+q;
 }
 function bWP(){
-  return actor("fayoussef~wallapop-scraper",{startUrls:[{url:uWP()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
+  return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:20,proxyConfiguration:{useApifyProxy:true}})
     .then(function(d){if(d[0])log("🔬 WP1: "+(d[0].title||((d[0].brand||"")+" "+(d[0].model||""))));d.slice(0,20).forEach(function(it){push(it,"Wallapop","#13c1ac",uWP());});})
     .catch(function(e){log("❌ Wallapop: "+e.message);});
 }
