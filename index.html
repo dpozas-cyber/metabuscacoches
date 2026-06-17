@@ -43,6 +43,7 @@ h1{font-size:19px;font-weight:700}
     <div class="grid2">
       <div><label class="lbl">Marca</label><select class="inp" id="selMarca" onchange="onMarca()"></select></div>
       <div><label class="lbl">Modelo</label><select class="inp" id="selModelo"><option value="">Cualquiera</option></select></div>
+      <div style="grid-column:span 2"><label class="lbl">O escribe el modelo (tiene prioridad)</label><input class="inp" id="txtModelo" placeholder="Ej: Barchetta, Multipla..." oninput="if(res.length)render()"></div>
       <div><label class="lbl">Precio desde (€)</label><input type="number" class="inp" id="pMin" placeholder="0"></div>
       <div><label class="lbl">Precio hasta (€)</label><input type="number" class="inp" id="pMax" placeholder="20.000"></div>
     </div>
@@ -74,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v40";
+var VER="v41";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -129,10 +130,11 @@ var MM={"Cualquiera":[],
 "Volkswagen":["Amarok","Arteon","Beetle","Caddy","Golf","Golf GTI","Golf GTD","Golf GTE","Golf R","Golf Variant","ID.3","ID.4","ID.4 GTX","ID.5","ID.7","ID. Buzz","Multivan","Passat","Passat GTE","Passat Variant","Polo","Polo GTI","Scirocco","Sharan","T-Cross","T-Roc","T-Roc R","Taigo","Tiguan","Tiguan Allspace","Touareg","Touran","Up"],
 "Volvo":["C30","C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"]};
 var MARCAS=Object.keys(MM);
-var MID={"Alfa Romeo":"1","Audi":"4","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Jaguar":"21","Jeep":"22","Kia":"24","Land Rover":"27","Lexus":"28","Mazda":"33","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Porsche":"44","Renault":"47","Seat":"51","Skoda":"52","Smart":"53","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
-var MDID={"Audi":"1900","BMW":"3500","Citroën":"5900","Dacia":"6600","Fiat":"8600","Ford":"9000","Honda":"11000","Hyundai":"11600","Jaguar":"12100","Jeep":"12400","Kia":"13200","Land Rover":"14600","Lexus":"15200","Mazda":"16800","Mercedes":"17200","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19800","Porsche":"20000","Renault":"20700","Seat":"22500","Skoda":"22900","Smart":"23000","Subaru":"23500","Suzuki":"23600","Toyota":"24100","Volvo":"25100","Volkswagen":"25200","Tesla":"135","Alfa Romeo":"140"};
+var MID={"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
+var MDID={"Abarth":"100","Alfa Romeo":"140","Alpine":"400","Aston Martin":"160","Audi":"1900","Bentley":"2200","BMW":"3500","Citroën":"5900","Cupra":"5300","Dacia":"6600","DS":"6750","Ferrari":"8000","Fiat":"8600","Ford":"9000","Honda":"11000","Hyundai":"11600","Infiniti":"12000","Jaguar":"12100","Jeep":"12400","Kia":"13200","Lamborghini":"14000","Lancia":"14400","Land Rover":"14600","Lexus":"15200","Maserati":"16600","Mazda":"16800","McLaren":"16950","Mercedes":"17200","MG":"17350","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19800","Polestar":"19850","Porsche":"20000","Renault":"20700","Rolls-Royce":"21100","Seat":"22500","Skoda":"22900","Smart":"23000","SsangYong":"23200","Subaru":"23500","Suzuki":"23600","Tesla":"135","Toyota":"24100","Volkswagen":"25200","Volvo":"25100"};
 
 function v(id){return document.getElementById(id).value;}
+function modelo(){return (v("txtModelo")||"").trim()||v("selModelo")||"";}
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function pp(v){if(typeof v==="number")return Math.round(v);if(!v)return 0;var m=String(v).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
 function ay(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
@@ -147,7 +149,7 @@ function onMarca(){
 
 // ====== URL builders ======
 function uAS(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=v("selModelo");
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
   var q="atype=C&ustate=N,U&cy=E&sort=standard&size=20";
   if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");
   if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");
@@ -155,7 +157,7 @@ function uAS(){
   return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;
 }
 function uWP(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=v("selModelo");
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
   var q="category_id=100&order_by=most_relevance";
   if(m)q+="&brand="+encodeURIComponent(m);if(mo)q+="&model="+encodeURIComponent(mo);
   if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");
@@ -190,7 +192,7 @@ function uMN(){
   return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;
 }
 function uPark(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=v("selModelo");
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
   return "https://www.theparking.eu/used-cars/"+(m?slug(m)+(mo?"-"+slug(mo):""):"coches")+".html";
 }
 
@@ -287,7 +289,7 @@ function addMila(){
     });
     var n=res.length-antes;
     log("📦 Milanuncios: "+n+" encontrados");
-    var mo=(v("selModelo")||"").toLowerCase();
+    var mo=modelo().toLowerCase();
     if(mo&&n>0){
       var vis=0;for(var i=antes;i<res.length;i++)if(res[i].titulo.toLowerCase().replace(/[\s-]/g,"").indexOf(mo.replace(/[\s-]/g,""))!==-1)vis++;
       if(vis<n)log("ℹ️ "+(n-vis)+" ocultos (Milanuncios no filtra por modelo)");
@@ -323,7 +325,7 @@ function buscar(){
 
 // ====== RENDER ======
 function render(){
-  var ord=v("ord"),mo=(v("selModelo")||"").toLowerCase(),seen={};
+  var ord=v("ord"),mo=modelo().toLowerCase(),seen={};
   var arr=res.filter(function(r){
     if(seen[r.url])return false;seen[r.url]=true;
     if(mo&&r.titulo.toLowerCase().replace(/[\s-]/g,"").indexOf(mo.replace(/[\s-]/g,""))===-1)return false;
