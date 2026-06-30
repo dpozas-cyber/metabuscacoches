@@ -52,6 +52,10 @@ h1{font-size:19px;font-weight:700}
       <div><label class="lbl">Año hasta</label><input type="number" class="inp" id="aMax" placeholder="2024"></div>
       <div><label class="lbl">Km máximos</label><input type="number" class="inp" id="kmMax" placeholder="100.000"></div>
     </div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:6px">
+      <input type="checkbox" id="chkEuropa" style="width:16px;height:16px">
+      <label for="chkEuropa" style="font-size:13px;color:#4a5568">🌍 Buscar también en Europa (AutoScout24)</label>
+    </div>
     <button class="btn-main" id="btnB" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
   </div>
 
@@ -75,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v53";
+var VER="v57";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -143,7 +147,7 @@ function cargarMarcas(){
     });
 }
 
-function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var q="atype=C&ustate=N,U&cy=A,B,E,F,I,L,NL,D&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
+function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var paises=document.getElementById("chkEuropa").checked?"A,B,E,F,I,L,NL,D":"E";var q="atype=C&ustate=N,U&cy="+paises+"&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
 function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
 function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
 function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
@@ -184,8 +188,11 @@ function matchModelo(r,mo){
   return tit.indexOf(needle)!==-1||mod.indexOf(needle)!==-1||(marc+mod).indexOf(needle)!==-1;
 }
 
-function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 AS keys: "+Object.keys(d[0]).join(", "));d.slice(0,40).forEach(function(it){
-  var pais=(it.location&&(it.location.countryCode||it.location.country))||it.countryCode||it.country||"";
+function bandera(cc){
+  var f={"ES":"🇪🇸","DE":"🇩🇪","FR":"🇫🇷","IT":"🇮🇹","NL":"🇳🇱","BE":"🇧🇪","AT":"🇦🇹","LU":"🇱🇺","PT":"🇵🇹","GB":"🇬🇧"};
+  return f[(cc||"").toUpperCase()]||"";
+}return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){
+  var pais=it.countryVersion||"";
   var r={
     titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
     precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
@@ -205,16 +212,16 @@ function bWP(){
     proxyConfiguration:{useApifyProxy:true}
   };
   return actor("fayoussef~wallapop-scraper",input).then(function(d){
-    if(d[0])log("🔬 WP keys: "+Object.keys(d[0]).join(", "));
-    if(d[1])log("🔬 WP[1] price="+d[1].price+" sale_price="+d[1].sale_price+" salePrice="+d[1].salePrice);
     d.slice(0,40).forEach(function(it){
-      var precio=it.sale_price||it.salePrice||it.price_amount||it.price||0;
+      var precio=it.price||0;
       var url=it.listing_url||it.share_url||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:uWP());
       var img=(it.images&&it.images[0])||it.imageUrl||null;
+      var pais=it.country_code||"";
+      var badge=pais&&pais.toUpperCase()!=="ES"?"Wallapop "+bandera(pais)+" "+pais.toUpperCase():"Wallapop";
       res.push({
         titulo:(it.title||((it.brand||"")+" "+(it.model||"")).trim()||"Sin título").slice(0,70),
         precio:pp(precio),km:pp(it.km||0),ano:ay(it.year||0),
-        portal:"Wallapop",color:"#13c1ac",url:url,
+        portal:badge,color:"#13c1ac",url:url,
         descripcion:[it.engine,it.gear_box,it.body_type].filter(Boolean).join(", ").slice(0,60),
         imagen:img,_marca:(it.brand||"").toLowerCase(),_modelo:(it.model||"").toLowerCase()
       });
@@ -278,7 +285,8 @@ function buscar(){
 function render(){
   var ord=v("ord"),mo=modelo().toLowerCase(),seen={};
   var arr=res.filter(function(r){
-    if(seen[r.url])return false;seen[r.url]=true;
+    var key=(r.titulo+"|"+r.precio+"|"+r.km+"|"+r.ano).toLowerCase();
+    if(seen[key])return false;seen[key]=true;
     if(mo&&!matchModelo(r,mo))return false;
     return true;
   }).sort(function(a,b){
