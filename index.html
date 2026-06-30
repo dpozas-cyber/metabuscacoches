@@ -143,7 +143,7 @@ function cargarMarcas(){
     });
 }
 
-function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var q="atype=C&ustate=N,U&cy=E&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
+function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var q="atype=C&ustate=N,U&cy=A,B,E,F,I,L,NL,D&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
 function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
 function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
 function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
@@ -184,7 +184,20 @@ function matchModelo(r,mo){
   return tit.indexOf(needle)!==-1||mod.indexOf(needle)!==-1||(marc+mod).indexOf(needle)!==-1;
 }
 
-function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
+function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 AS keys: "+Object.keys(d[0]).join(", "));d.slice(0,40).forEach(function(it){
+  var pais=(it.location&&(it.location.countryCode||it.location.country))||it.countryCode||it.country||"";
+  var r={
+    titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
+    precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
+    portal:"AutoScout24"+(pais?" ("+pais.toUpperCase()+")":""),color:"#f47920",
+    url:it.url||it.listingUrl||uAS(),
+    descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
+    imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null,
+    _marca:(it.manufacturer||it.make||it.brand||"").toLowerCase(),
+    _modelo:(it.model||it.modelName||it.modelLine||"").toLowerCase()
+  };
+  res.push(r);
+});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
 function bWP(){
   var input={
     start_urls:[{url:uWP()}],
