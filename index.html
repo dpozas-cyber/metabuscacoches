@@ -186,19 +186,11 @@ function matchModelo(r,mo){
 
 function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"AutoScout24","#f47920",uAS());});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
 function bWP(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
-  var kw=(m+" "+mo).trim();
   var input={
-    search:kw,
-    category:"100",
+    start_urls:[{url:uWP()}],
     maxItems:40,
     proxyConfiguration:{useApifyProxy:true}
   };
-  if(v("pMin"))input.minPrice=parseInt(v("pMin"),10);
-  if(v("pMax"))input.maxPrice=parseInt(v("pMax"),10);
-  if(v("aMin"))input.minYear=parseInt(v("aMin"),10);
-  if(v("aMax"))input.maxYear=parseInt(v("aMax"),10);
-  if(v("kmMax"))input.maxKm=parseInt(v("kmMax"),10);
   return actor("fayoussef~wallapop-scraper",input).then(function(d){
     if(d[0])log("🔬 WP keys: "+Object.keys(d[0]).join(", "));
     if(d[1])log("🔬 WP[1] price="+d[1].price+" sale_price="+d[1].sale_price+" salePrice="+d[1].salePrice);
