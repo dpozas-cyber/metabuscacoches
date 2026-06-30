@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v57";
+var VER="v58";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -191,7 +191,9 @@ function matchModelo(r,mo){
 function bandera(cc){
   var f={"ES":"🇪🇸","DE":"🇩🇪","FR":"🇫🇷","IT":"🇮🇹","NL":"🇳🇱","BE":"🇧🇪","AT":"🇦🇹","LU":"🇱🇺","PT":"🇵🇹","GB":"🇬🇧"};
   return f[(cc||"").toUpperCase()]||"";
-}return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){
+}
+
+function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){
   var pais=it.countryVersion||"";
   var r={
     titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
