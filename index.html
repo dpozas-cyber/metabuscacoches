@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v58";
+var VER="v59";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -151,7 +151,7 @@ function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();v
 function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
 function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
 function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
-function uMN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q="demanda=n&orden=relevance&fromSearch=1";if(mId)q+="&marca="+mId;if(v("pMin"))q+="&desde="+v("pMin");if(v("pMax"))q+="&hasta="+v("pMax");if(v("aMin"))q+="&anod="+v("aMin");if(v("aMax"))q+="&anoh="+v("aMax");if(v("kmMax"))q+="&kilometersTo="+v("kmMax");return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;}
+function uMN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo(),mId=m?(MID[m]||""):"";var kw=(m+" "+mo).trim();var q="demanda=n&orden=relevance&fromSearch=1";if(kw)q+="&s="+encodeURIComponent(kw);if(mId)q+="&marca="+mId;if(v("pMin"))q+="&desde="+v("pMin");if(v("pMax"))q+="&hasta="+v("pMax");if(v("aMin"))q+="&anod="+v("aMin");if(v("aMax"))q+="&anoh="+v("aMax");if(v("kmMax"))q+="&kilometersTo="+v("kmMax");return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;}
 function uPark(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();return "https://www.theparking.eu/used-cars/"+(m?slug(m)+(mo?"-"+slug(mo):""):"coches")+".html";}
 
 function actor(id,input){
@@ -193,7 +193,7 @@ function bandera(cc){
   return f[(cc||"").toUpperCase()]||"";
 }
 
-function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){
+function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 AS countryVersion="+d[0].countryVersion+" location="+JSON.stringify(d[0].location||{}));d.slice(0,40).forEach(function(it){
   var pais=it.countryVersion||"";
   var r={
     titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
