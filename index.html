@@ -38,7 +38,6 @@ h1{font-size:19px;font-weight:700}
       <p class="sub">AutoScout24 · Wallapop · Coches.net · mobile.de · <b id="ver"></b></p>
     </div>
   </div>
-
   <div class="card">
     <div class="grid2">
       <div><label class="lbl">Marca</label><select class="inp" id="selMarca" onchange="onMarca()"></select></div>
@@ -58,7 +57,6 @@ h1{font-size:19px;font-weight:700}
     </div>
     <button class="btn-main" id="btnB" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
   </div>
-
   <div id="orden" class="hidden" style="margin-bottom:12px">
     <select class="inp" id="ord" onchange="render()">
       <option value="p_asc">💰 Precio: menor primero</option>
@@ -71,15 +69,13 @@ h1{font-size:19px;font-weight:700}
       <a class="extra-btn" id="lnkP" style="color:#e91e63;border-color:#e91e63" href="#" target="_blank">🔗 The Parking</a>
     </div>
   </div>
-
   <div id="estado" class="empty"><div style="font-size:40px">🚗</div><p style="font-weight:600;color:#718096">Configura los filtros y pulsa Buscar</p></div>
   <div id="lista"></div>
   <div id="log" class="log hidden"></div>
 </div>
-
 <script>
 "use strict";
-var VER="v69";
+var VER="v70";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -89,7 +85,7 @@ var MM={"Cualquiera":[],"Abarth":["595","595 Competizione","695","124 Spider","5
 var MARCAS=Object.keys(MM);
 var MID={"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 
-var CNMID={"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174","Tesla Model S Plaid":"1175"};return document.getElementById(id).value;}
+function v(id){return document.getElementById(id).value;}
 function modelo(){return (v("txtModelo")||"").trim()||v("selModelo")||"";}
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function pp(val){if(typeof val==="number")return Math.round(val);if(!val)return 0;var m=String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
@@ -193,27 +189,27 @@ function bandera(cc){
   return f[(cc||"").toLowerCase()]||"🌍";
 }
 
-function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 AS countryVersion="+d[0].countryVersion+" location="+JSON.stringify(d[0].location||{}));d.slice(0,40).forEach(function(it){
-  var pais=it.countryVersion||"";
-  var r={
-    titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
-    precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
-    portal:"AutoScout24"+(pais?" ("+pais.toUpperCase()+")":""),color:"#f47920",
-    url:it.url||it.listingUrl||uAS(),
-    descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
-    imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null,
-    _marca:(it.manufacturer||it.make||it.brand||"").toLowerCase(),
-    _modelo:(it.model||it.modelName||it.modelLine||"").toLowerCase()
-  };
-  res.push(r);
-});}).catch(function(e){log("❌ AutoScout24: "+e.message);});}
+function bAS(){
+  return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
+    d.slice(0,40).forEach(function(it){
+      var pais=it.countryVersion||"";
+      var badge=pais&&pais.toLowerCase()!=="españa"?"AutoScout24 "+bandera(pais)+" "+pais.toUpperCase():"AutoScout24";
+      res.push({
+        titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
+        precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
+        portal:badge,color:"#f47920",
+        url:it.url||it.listingUrl||uAS(),
+        descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
+        imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null,
+        _marca:(it.manufacturer||it.make||it.brand||"").toLowerCase(),
+        _modelo:(it.model||it.modelName||it.modelLine||"").toLowerCase()
+      });
+    });
+  }).catch(function(e){log("❌ AutoScout24: "+e.message);});
+}
+
 function bWP(){
-  var input={
-    start_urls:[{url:uWP()}],
-    maxItems:40,
-    proxyConfiguration:{useApifyProxy:true}
-  };
-  return actor("fayoussef~wallapop-scraper",input).then(function(d){
+  return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
     d.slice(0,40).forEach(function(it){
       var precio=it.price||0;
       var url=it.listing_url||it.share_url||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:uWP());
@@ -230,11 +226,23 @@ function bWP(){
     });
   }).catch(function(e){log("❌ Wallapop: "+e.message);});
 }
-function bCN(){return actor("ivanvs~coches-net-scraper",{urls:[{url:uCN()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});}).catch(function(e){log("❌ Coches.net: "+e.message);});}
-function bMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca");if(m&&!MDKEY[m]){log("ℹ️ mobile.de: "+m+" sin ref, omitido");return Promise.resolve();}return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){d.slice(0,40).forEach(function(it){
-  var titulo=(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70);
-  res.push({titulo:titulo,precio:precioDe(it),km:kmDe(it),ano:anoDe(it),portal:"mobile.de 🇩🇪",color:"#f5a623",url:it.url||it.listingUrl||uMD(),descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||null,_marca:(it.manufacturer||it.make||it.brand||titulo).toLowerCase(),_modelo:(it.model||it.modelName||titulo).toLowerCase()});
-});}).catch(function(e){log("❌ mobile.de: "+e.message);});}
+
+function bCN(){
+  return actor("ivanvs~coches-net-scraper",{urls:[{url:uCN()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
+    d.slice(0,40).forEach(function(it){push(it,"Coches.net","#1a6fb5",uCN());});
+  }).catch(function(e){log("❌ Coches.net: "+e.message);});
+}
+
+function bMD(){
+  var m=v("selMarca")==="Cualquiera"?"":v("selMarca");
+  if(m&&!MDKEY[m]){log("ℹ️ mobile.de: "+m+" sin ref, omitido");return Promise.resolve();}
+  return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
+    d.slice(0,40).forEach(function(it){
+      var titulo=(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70);
+      res.push({titulo:titulo,precio:precioDe(it),km:kmDe(it),ano:anoDe(it),portal:"mobile.de 🇩🇪",color:"#f5a623",url:it.url||it.listingUrl||uMD(),descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||null,_marca:(it.manufacturer||it.make||it.brand||titulo).toLowerCase(),_modelo:(it.model||it.modelName||titulo).toLowerCase()});
+    });
+  }).catch(function(e){log("❌ mobile.de: "+e.message);});
+}
 
 function addMila(){
   var btn=document.getElementById("btnM");
