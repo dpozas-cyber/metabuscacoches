@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v59";
+var VER="v60";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -189,8 +189,8 @@ function matchModelo(r,mo){
 }
 
 function bandera(cc){
-  var f={"ES":"🇪🇸","DE":"🇩🇪","FR":"🇫🇷","IT":"🇮🇹","NL":"🇳🇱","BE":"🇧🇪","AT":"🇦🇹","LU":"🇱🇺","PT":"🇵🇹","GB":"🇬🇧"};
-  return f[(cc||"").toUpperCase()]||"";
+  var f={"españa":"🇪🇸","alemania":"🇩🇪","francia":"🇫🇷","italia":"🇮🇹","países bajos":"🇳🇱","holanda":"🇳🇱","bélgica":"🇧🇪","austria":"🇦🇹","luxemburgo":"🇱🇺","portugal":"🇵🇹","reino unido":"🇬🇧"};
+  return f[(cc||"").toLowerCase()]||"🌍";
 }
 
 function bAS(){return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){if(d[0])log("🔬 AS countryVersion="+d[0].countryVersion+" location="+JSON.stringify(d[0].location||{}));d.slice(0,40).forEach(function(it){
@@ -240,6 +240,7 @@ function addMila(){
   fetch(PROXY+"/"+uMN()).then(function(r){return r.text();}).then(function(html){
     var doc=new DOMParser().parseFromString(html,"text/html");
     var cards=doc.querySelectorAll('article,[class*="AdCard"]');
+    log("🔬 MN cards encontradas: "+cards.length+" / html len: "+html.length);
     var antes=res.length;
     cards.forEach(function(c){
       var tEl=c.querySelector('h2,h3,[class*="Title"]');
