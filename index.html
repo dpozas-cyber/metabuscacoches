@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v65";
+var VER="v66";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -242,13 +242,24 @@ function addMila(){
   log("🌐 Milanuncios...");
   fetch(PROXY+"/"+uMN()).then(function(r){return r.text();}).then(function(html){
     var doc=new DOMParser().parseFromString(html,"text/html");
-    var cards=doc.querySelectorAll('article,[class*="AdCard"]');
-    log("🔬 MN html inicio: "+html.slice(0,200));
-    log("🔬 MN primera card classes: "+(cards[0]?cards[0].className:"ninguna"));
-    log("🔬 MN segunda card classes: "+(cards[1]?cards[1].className:"ninguna"));
-    // Intentar separar resultados reales de "parecidos"
-    var seccionParecidos=doc.querySelector('[class*="similar"],[class*="Similar"],[class*="related"],[class*="parecid"]');
-    log("🔬 MN seccion parecidos: "+(seccionParecidos?seccionParecidos.className:"no encontrada"));
+    // Solo tarjetas raíz, excluyendo hijos con -link
+    var todasCards=doc.querySelectorAll('.ma-AdCardV2:not(.ma-AdCardV2-link)');
+    // Cortar en "parecidos": buscar h2/h3 que contenga "parecido"
+    var cards=[];
+    var parecidosEncontrado=false;
+    todasCards.forEach(function(c){
+      if(parecidosEncontrado)return;
+      // Comprobar si hay un encabezado "parecidos" antes de esta card
+      var prev=c.previousElementSibling;
+      while(prev){
+        if(prev.tagName&&/^H[1-6]$/.test(prev.tagName)&&/parecid/i.test(prev.textContent)){parecidosEncontrado=true;return;}
+        prev=prev.previousElementSibling;
+      }
+      cards.push(c);
+    });
+    // Si no encontramos nada con la clase específica, fallback al selector anterior
+    if(cards.length===0)cards=Array.from(doc.querySelectorAll('article,[class*="AdCard"]:not([class*="AdCard-link"])'));
+    log("🔬 MN cards reales: "+cards.length+" de "+todasCards.length+" totales");
     var antes=res.length;
     cards.forEach(function(c){
       var tEl=c.querySelector('h2,h3,[class*="Title"],[class*="title"]');
