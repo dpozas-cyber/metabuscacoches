@@ -35,7 +35,7 @@ h1{font-size:19px;font-weight:700}
     <div class="logo">&#128269;</div>
     <div>
       <h1>El Super Buscador</h1>
-      <p class="sub">AutoScout24 &middot; Wallapop &middot; Coches.net &middot; mobile.de &middot; Milanuncios &middot; <b id="ver"></b></p>
+      <p class="sub">AutoScout24 &middot; Wallapop &middot; Coches.net &middot; mobile.de &middot; <b id="ver"></b></p>
     </div>
   </div>
   <div class="card">
@@ -65,6 +65,7 @@ h1{font-size:19px;font-weight:700}
       <option value="a_desc">M&aacute;s nuevos primero</option>
     </select>
     <div style="display:flex;gap:8px;margin-top:8px">
+      <a class="extra-btn" id="lnkMN" style="color:#e67e22;border-color:#e67e22" href="#" target="_blank">Milanuncios</a>
       <a class="extra-btn" id="lnkP" style="color:#e91e63;border-color:#e91e63" href="#" target="_blank">The Parking</a>
     </div>
   </div>
@@ -74,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v77";
+var VER = "v78";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -315,40 +316,16 @@ function bMD() {
   }).catch(function(e) { log("Error mobile.de: " + e.message); });
 }
 
-function bMN() {
-  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
-  var kw = (m + " " + mo).trim() || m || "coche";
-  return actor("zen-studio~milanuncios-scraper", {text:kw, maxResults:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
-    var needle = kw.toLowerCase().replace(/[\s\-]/g,"");
-    d.slice(0,40).forEach(function(it) {
-      var att = it.attributes || {};
-      var titulo = (it.title || it.name || kw || "Sin titulo").slice(0,70);
-      if (needle && titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(needle) === -1) return;
-      var ano = ay((att.year && att.year.raw) || it.year || 0);
-      if (v("aMax") && ano > 0 && ano > parseInt(v("aMax"),10)) return;
-      if (v("aMin") && ano > 0 && ano < parseInt(v("aMin"),10)) return;
-      var km = pp((att.kilometers && att.kilometers.raw) || it.mileage || it.km || 0);
-      if (v("kmMax") && km > 0 && km > parseInt(v("kmMax"),10)) return;
-      var url = (it.url || it.listingUrl || "").replace(/^https?:\/\/[^\/]*metabuscacoches[^\/]*/,"https://www.milanuncios.com");
-      if (!url || url.indexOf("milanuncios") === -1) url = uMN();
-      var img = null;
-      if (it.images && it.images.length > 0) img = it.images[0].url || it.images[0];
-      if (!img) img = it.image || it.imageUrl || null;
-      res.push({
-        titulo: titulo, precio: pp(it.price || it.salePrice || 0), km: km, ano: ano,
-        portal: "Milanuncios", color: "#e67e22", url: url,
-        descripcion: [(att.fuel && att.fuel.formatted), (att.transmission && att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
-        imagen: img, _marca: (it.brand || it.make || m || "").toLowerCase(), _modelo: (it.model || titulo).toLowerCase()
-      });
-    });
-  }).catch(function(e) { log("Error Milanuncios: " + e.message); });
-}
+function bMN() { return Promise.resolve(); }
+
 
 function buscar() {
   res = [];
   document.getElementById("log").innerHTML = "";
   document.getElementById("lista").innerHTML = "";
   document.getElementById("orden").className = "hidden";
+  document.getElementById("lnkMN").href = uMN();
+  document.getElementById("lnkMN").href = uMN();
   document.getElementById("lnkP").href = uPark();
   var estado = document.getElementById("estado");
   estado.className = "empty";
@@ -403,4 +380,4 @@ function render() {
 })();
 </script>
 </body>
-</html
+</html>
