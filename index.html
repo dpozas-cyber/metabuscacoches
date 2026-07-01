@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v68";
+var VER="v69";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -89,7 +89,7 @@ var MM={"Cualquiera":[],"Abarth":["595","595 Competizione","695","124 Spider","5
 var MARCAS=Object.keys(MM);
 var MID={"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 
-function v(id){return document.getElementById(id).value;}
+var CNMID={"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174","Tesla Model S Plaid":"1175"};return document.getElementById(id).value;}
 function modelo(){return (v("txtModelo")||"").trim()||v("selModelo")||"";}
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function pp(val){if(typeof val==="number")return Math.round(val);if(!val)return 0;var m=String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
@@ -149,7 +149,7 @@ function cargarMarcas(){
 
 function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var paises=document.getElementById("chkEuropa").checked?"A,B,E,F,I,L,NL,D":"E";var q="atype=C&ustate=N,U&cy="+paises+"&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
 function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
-function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
+function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"",mo=modelo();var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");if(mo)q+=(q?"&":"")+"Text="+encodeURIComponent(mo);return "https://www.coches.net/search/"+(q?"?"+q:"");}
 function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var europa=document.getElementById("chkEuropa").checked;var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(!europa)q+="&cn=ES";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
 function uMN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo(),mId=m?(MID[m]||""):"";var kw=(m+" "+mo).trim();var q="demanda=n&orden=relevance&fromSearch=1";if(kw)q+="&s="+encodeURIComponent(kw);if(mId)q+="&marca="+mId;if(v("pMin"))q+="&desde="+v("pMin");if(v("pMax"))q+="&hasta="+v("pMax");if(v("aMin"))q+="&anod="+v("aMin");if(v("aMax"))q+="&anoh="+v("aMax");if(v("kmMax"))q+="&kilometersTo="+v("kmMax");return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;}
 function uPark(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();return "https://www.theparking.eu/used-cars/"+(m?slug(m)+(mo?"-"+slug(mo):""):"coches")+".html";}
@@ -243,7 +243,7 @@ function addMila(){
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
   var kw=(m+" "+mo).trim()||m||"coche";
   actor("zen-studio~milanuncios-scraper",{text:kw,maxResults:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    if(d[0])log("🔬 MN keys: "+Object.keys(d[0]).join(", "));
+    if(d[0])log("🔬 MN[0]: "+JSON.stringify(d[0]).slice(0,500));
     var antes=res.length;
     d.slice(0,40).forEach(function(it){
       var titulo=(it.title||it.name||kw||"Sin título").slice(0,70);
