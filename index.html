@@ -35,7 +35,7 @@ h1{font-size:19px;font-weight:700}
     <div class="logo">&#128269;</div>
     <div>
       <h1>El Super Buscador</h1>
-      <p class="sub">AutoScout24 &middot; Wallapop &middot; Coches.net &middot; mobile.de &middot; <b id="ver"></b></p>
+      <p class="sub">AutoScout24 &middot; Wallapop &middot; Coches.net &middot; mobile.de &middot; Milanuncios &middot; <b id="ver"></b></p>
     </div>
   </div>
   <div class="card">
@@ -74,7 +74,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v76";
+var VER = "v77";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -83,11 +83,8 @@ var MDKEY = {};
 var MM = {"Cualquiera":[],"Abarth":["595","695","124 Spider"],"Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Brera","Mito","GT","Spider","4C"],"Alpine":["A110","A290"],"Aston Martin":["DB11","DB12","DBS","DBX","Vantage"],"Audi":["A1","A2","A3","A3 Sportback","A4","A4 Avant","A5","A5 Sportback","A6","A6 Avant","A7","A8","Q2","Q3","Q4 e-tron","Q5","Q7","Q8","R8","RS3","RS4","RS5","RS6","RS7","S3","S4","S5","S6","TT","e-tron","e-tron GT"],"Bentley":["Bentayga","Continental GT","Flying Spur"],"BMW":["Serie 1","Serie 2","Serie 3","Serie 4","Serie 5","Serie 7","Serie 8","X1","X2","X3","X4","X5","X6","X7","Z4","i3","i4","i5","i7","iX","M3","M4","M5"],"Citroen":["C1","C2","C3","C3 Aircross","C4","C4 Cactus","C5","C5 Aircross","Berlingo"],"Cupra":["Ateca","Born","Formentor","Leon","Tavascan"],"Dacia":["Duster","Jogger","Logan","Sandero","Spring"],"DS":["DS3","DS4","DS5","DS7","DS9"],"Ferrari":["296 GTB","458","488","812","F8","California","Portofino","Roma","SF90","Purosangue"],"Fiat":["500","500C","500e","500L","500X","Bravo","Panda","Punto","Tipo"],"Ford":["Fiesta","Fiesta ST","Focus","Focus ST","Galaxy","Kuga","Mondeo","Mustang","Mustang Mach-E","Puma","Ranger","S-Max"],"Honda":["Civic","Civic Type R","CR-V","HR-V","Jazz","NSX","ZR-V","e"],"Hyundai":["i10","i20","i30","i30 N","Ioniq 5","Ioniq 6","Kona","Santa Fe","Tucson"],"Infiniti":["Q30","Q50","Q60","QX30","QX50","QX70"],"Jaguar":["E-Pace","F-Pace","F-Type","I-Pace","XE","XF","XJ"],"Jeep":["Avenger","Cherokee","Compass","Grand Cherokee","Renegade","Wrangler"],"Kia":["Ceed","EV6","EV9","Niro","Picanto","ProCeed","Sorento","Sportage","Stinger","Xceed"],"Lamborghini":["Aventador","Gallardo","Huracan","Urus","Revuelto"],"Lancia":["Delta","Ypsilon"],"Land Rover":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],"Lexus":["CT 200h","ES 300h","IS 300h","LC 500","NX 300h","NX 450h","RX 450h","UX 250h","UX 300e"],"Maserati":["Ghibli","GranTurismo","Grecale","Levante","MC20","Quattroporte"],"Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","MX-5","MX-30"],"McLaren":["570S","720S","750S","Artura","GT"],"Mercedes":["Clase A","Clase B","Clase C","Clase E","Clase S","CLA","CLE","CLS","GLA","GLB","GLC","GLE","GLS","Clase G","EQA","EQB","EQC","EQE","EQS","SL","AMG GT","Vito","Clase V"],"MG":["HS","ZS","ZS EV","Cyberster"],"Mini":["Cooper","Cooper S","Cooper SE","Cabrio","Clubman","Countryman","JCW","One"],"Mitsubishi":["ASX","Eclipse Cross","Outlander","Outlander PHEV"],"Nissan":["370Z","Ariya","Juke","Leaf","Micra","Navara","Qashqai","X-Trail"],"Opel":["Astra","Corsa","Corsa-e","Crossland","Grandland","Insignia","Mokka","Mokka-e"],"Peugeot":["208","208 e","2008","3008","308","408","508","5008","RCZ"],"Polestar":["1","2","3","4"],"Porsche":["718 Boxster","718 Cayman","911 Carrera","911 GT3","911 Turbo","Cayenne","Macan","Panamera","Taycan"],"Renault":["Arkana","Austral","Captur","Clio","Espace","Kadjar","Kangoo","Megane","Scenic","Zoe"],"Rolls-Royce":["Cullinan","Ghost","Phantom","Spectre","Wraith"],"Seat":["Alhambra","Arona","Ateca","Ibiza","Leon","Mii","Tarraco","Toledo"],"Skoda":["Enyaq","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Octavia RS","Superb","Yeti"],"Smart":["ForTwo","ForFour","EQ ForTwo"],"SsangYong":["Korando","Musso","Rexton","Tivoli","Torres"],"Subaru":["BRZ","Forester","Impreza","Outback","Solterra","WRX STI","XV"],"Suzuki":["Ignis","Jimny","S-Cross","Swift","Vitara"],"Tesla":["Model 3","Model 3 Long Range","Model 3 Performance","Model S","Model S Plaid","Model X","Model Y","Model Y Long Range","Model Y Performance","Cybertruck"],"Toyota":["Aygo","Aygo X","bZ4X","C-HR","Corolla","GR Supra","GR Yaris","Land Cruiser","Prius","RAV4","RAV4 Hybrid","Yaris","Yaris GR"],"Volkswagen":["Golf","Golf GTI","Golf R","Golf Variant","ID.3","ID.4","ID.5","ID.7","ID. Buzz","Passat","Polo","Polo GTI","T-Cross","T-Roc","Tiguan","Touareg","Touran","Up"],"Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V60","V90","XC40","XC60","XC90"]};
 
 var MARCAS = Object.keys(MM);
-
 var MID = {"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroen":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
-
 var CNMAKE = {"Tesla":"1354","BMW":"5","Mercedes":"34","Audi":"4","Volkswagen":"63","Seat":"51","Renault":"47","Peugeot":"41","Opel":"40","Ford":"15","Citroen":"8","Fiat":"14","Toyota":"58","Nissan":"39","Hyundai":"19","Kia":"24","Skoda":"52","Volvo":"64","Porsche":"44","Mini":"37","Suzuki":"57","Honda":"18","Mazda":"33","Dacia":"29","Cupra":"76","Jeep":"22","Land Rover":"27","Jaguar":"21","Lexus":"28","Mitsubishi":"36","Subaru":"56","Smart":"53","Alfa Romeo":"1","Lancia":"25","Maserati":"32","Ferrari":"13","Lamborghini":"26","Aston Martin":"3","Bentley":"6","McLaren":"73","Rolls-Royce":"48","Alpine":"83","DS":"75","MG":"72","Polestar":"85","SsangYong":"55","Infiniti":"61"};
-
 var CNMODEL = {"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174"};
 
 function v(id) { return document.getElementById(id).value; }
@@ -99,8 +96,7 @@ function log(msg) { var el = document.getElementById("log"); el.className = "log
 
 function onMarca() {
   var sel = document.getElementById("selModelo");
-  sel.innerHTML = "<option value=''>Cargando...</option>";
-  sel.disabled = true;
+  sel.innerHTML = "<option value=''>Cargando...</option>"; sel.disabled = true;
   var m = v("selMarca");
   if (m === "Cualquiera") { sel.innerHTML = "<option value=''>Cualquiera</option>"; sel.disabled = false; return; }
   var key = MDKEY[m];
@@ -235,8 +231,7 @@ function anoDe(it) { var a = it.year || it.firstRegistrationYear; if (!a && it.f
 function push(it, portal, color, fallbackUrl) {
   res.push({
     titulo: (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70),
-    precio: precioDe(it), km: kmDe(it), ano: anoDe(it),
-    portal: portal, color: color,
+    precio: precioDe(it), km: kmDe(it), ano: anoDe(it), portal: portal, color: color,
     url: it.url || it.listingUrl || (it.web_slug ? "https://es.wallapop.com/item/" + it.web_slug : fallbackUrl),
     descripcion: [it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
     imagen: (it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || it.image_url || null,
@@ -266,11 +261,11 @@ function bAS() {
   return actor("ivanvs~autoscout-scraper", {urls:[{url:uAS()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
     d.slice(0,40).forEach(function(it) {
       var pais = it.countryVersion || "";
-      var badge = (pais && pais.toLowerCase() !== "espana" && pais.toLowerCase() !== "españa") ? "AutoScout24 " + bandera(pais) + " " + pais.toUpperCase() : "AutoScout24";
+      var norm = pais.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+      var badge = (pais && norm !== "espana") ? "AutoScout24 " + bandera(pais) + " " + pais.toUpperCase() : "AutoScout24";
       res.push({
         titulo: (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70),
-        precio: precioDe(it), km: kmDe(it), ano: anoDe(it),
-        portal: badge, color: "#f47920",
+        precio: precioDe(it), km: kmDe(it), ano: anoDe(it), portal: badge, color: "#f47920",
         url: it.url || it.listingUrl || uAS(),
         descripcion: [it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
         imagen: (it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null,
@@ -299,7 +294,6 @@ function bWP() {
 
 function bCN() {
   var url = uCN();
-  log("Coches.net: " + url);
   return actor("ivanvs~coches-net-scraper", {urls:[{url:url}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
     d.slice(0,40).forEach(function(it) { push(it, "Coches.net", "#1a6fb5", url); });
   }).catch(function(e) { log("Error Coches.net: " + e.message); });
@@ -311,7 +305,12 @@ function bMD() {
   return actor("ivanvs~mobile-de-scraper", {urls:[{url:uMD()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
     d.slice(0,40).forEach(function(it) {
       var titulo = (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70);
-      res.push({titulo:titulo, precio:precioDe(it), km:kmDe(it), ano:anoDe(it), portal:"mobile.de", color:"#f5a623", url:it.url || it.listingUrl || uMD(), descripcion:[it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60), imagen:(it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null, _marca:(it.manufacturer || it.make || it.brand || titulo).toLowerCase(), _modelo:(it.model || it.modelName || titulo).toLowerCase()});
+      res.push({titulo:titulo, precio:precioDe(it), km:kmDe(it), ano:anoDe(it), portal:"mobile.de", color:"#f5a623",
+        url:it.url || it.listingUrl || uMD(),
+        descripcion:[it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
+        imagen:(it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null,
+        _marca:(it.manufacturer || it.make || it.brand || titulo).toLowerCase(),
+        _modelo:(it.model || it.modelName || titulo).toLowerCase()});
     });
   }).catch(function(e) { log("Error mobile.de: " + e.message); });
 }
@@ -325,11 +324,9 @@ function bMN() {
       var att = it.attributes || {};
       var titulo = (it.title || it.name || kw || "Sin titulo").slice(0,70);
       if (needle && titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(needle) === -1) return;
-      // Filtrar por año si se especifica
       var ano = ay((att.year && att.year.raw) || it.year || 0);
       if (v("aMax") && ano > 0 && ano > parseInt(v("aMax"),10)) return;
       if (v("aMin") && ano > 0 && ano < parseInt(v("aMin"),10)) return;
-      // Filtrar por km si se especifica
       var km = pp((att.kilometers && att.kilometers.raw) || it.mileage || it.km || 0);
       if (v("kmMax") && km > 0 && km > parseInt(v("kmMax"),10)) return;
       var url = (it.url || it.listingUrl || "").replace(/^https?:\/\/[^\/]*metabuscacoches[^\/]*/,"https://www.milanuncios.com");
@@ -338,55 +335,13 @@ function bMN() {
       if (it.images && it.images.length > 0) img = it.images[0].url || it.images[0];
       if (!img) img = it.image || it.imageUrl || null;
       res.push({
-        titulo: titulo,
-        precio: pp(it.price || it.salePrice || 0),
-        km: km, ano: ano,
+        titulo: titulo, precio: pp(it.price || it.salePrice || 0), km: km, ano: ano,
         portal: "Milanuncios", color: "#e67e22", url: url,
         descripcion: [(att.fuel && att.fuel.formatted), (att.transmission && att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
-        imagen: img,
-        _marca: (it.brand || it.make || m || "").toLowerCase(),
-        _modelo: (it.model || titulo).toLowerCase()
+        imagen: img, _marca: (it.brand || it.make || m || "").toLowerCase(), _modelo: (it.model || titulo).toLowerCase()
       });
     });
   }).catch(function(e) { log("Error Milanuncios: " + e.message); });
-}
-  var btn = document.getElementById("btnM");
-  btn.disabled = true; btn.textContent = "Buscando Milanuncios...";
-  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
-  var kw = (m + " " + mo).trim() || m || "coche";
-  log("Milanuncios: buscando " + kw);
-  actor("zen-studio~milanuncios-scraper", {text:kw, maxResults:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
-    var antes = res.length;
-    var needle = kw.toLowerCase().replace(/[\s\-]/g,"");
-    d.slice(0,40).forEach(function(it) {
-      var att = it.attributes || {};
-      var titulo = (it.title || it.name || kw || "Sin titulo").slice(0,70);
-      if (needle && titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(needle) === -1) return;
-      var url = (it.url || it.listingUrl || "").replace(/^https?:\/\/[^\/]*metabuscacoches[^\/]*/,"https://www.milanuncios.com");
-      if (!url || url.indexOf("milanuncios") === -1) url = uMN();
-      var img = null;
-      if (it.images && it.images.length > 0) img = it.images[0].url || it.images[0];
-      if (!img) img = it.image || it.imageUrl || null;
-      res.push({
-        titulo: titulo,
-        precio: pp(it.price || it.salePrice || 0),
-        km: pp((att.kilometers && att.kilometers.raw) || it.mileage || it.km || 0),
-        ano: ay((att.year && att.year.raw) || it.year || it.modelYear || 0),
-        portal: "Milanuncios", color: "#e67e22", url: url,
-        descripcion: [(att.fuel && att.fuel.formatted), (att.transmission && att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
-        imagen: img,
-        _marca: (it.brand || it.make || m || "").toLowerCase(),
-        _modelo: (it.model || titulo).toLowerCase()
-      });
-    });
-    var n = res.length - antes;
-    log("Milanuncios: " + n + " encontrados");
-    btn.disabled = false; btn.textContent = n > 0 ? "OK Milanuncios" : "+ Milanuncios";
-    if (n > 0) render();
-  }).catch(function(e) {
-    log("Error Milanuncios: " + e.message);
-    btn.disabled = false; btn.textContent = "+ Milanuncios";
-  });
 }
 
 function buscar() {
@@ -434,7 +389,8 @@ function render() {
       + (r.ano > 0 ? '<span style="font-size:12px;color:#4a5568">' + r.ano + '</span>' : '')
       + (r.km > 0 ? '<span style="font-size:12px;color:#4a5568">' + r.km.toLocaleString("es") + ' km</span>' : '')
       + '</div></div>'
-      + '<div style="text-align:right;flex-shrink:0"><p style="font-size:18px;font-weight:700;color:#2c5282;margin:0">' + (r.precio > 0 ? r.precio.toLocaleString("es") + "&euro;" : "&mdash;") + '</p>'
+      + '<div style="text-align:right;flex-shrink:0"><p style="font-size:18px;font-weight:700;color:#2c5282;margin:0">'
+      + (r.precio > 0 ? r.precio.toLocaleString("es") + "&euro;" : "&mdash;") + '</p>'
       + '<span style="font-size:11px;color:#a0aec0">Ver &rarr;</span></div></div></a>';
   });
   if (arr.length) html += '<p style="text-align:center;font-size:11px;color:#a0aec0;margin-top:8px">' + arr.length + ' resultados</p>';
