@@ -54,7 +54,7 @@ h1{font-size:19px;font-weight:700}
     </div>
     <div style="margin-top:10px;display:flex;align-items:center;gap:6px">
       <input type="checkbox" id="chkEuropa" style="width:16px;height:16px">
-      <label for="chkEuropa" style="font-size:13px;color:#4a5568">🌍 Buscar también en Europa (AutoScout24)</label>
+      <label for="chkEuropa" style="font-size:13px;color:#4a5568">🌍 Búsqueda europea (AutoScout24 y mobile.de)</label>
     </div>
     <button class="btn-main" id="btnB" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
   </div>
@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v62";
+var VER="v63";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -150,7 +150,7 @@ function cargarMarcas(){
 function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var paises=document.getElementById("chkEuropa").checked?"A,B,E,F,I,L,NL,D":"E";var q="atype=C&ustate=N,U&cy="+paises+"&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
 function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
 function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mId=m?(MID[m]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
-function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
+function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var europa=document.getElementById("chkEuropa").checked;var q="isSearchRequest=true&s=Car&vc=Car&sb=rel";if(!europa)q+="&cn=ES";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://www.mobile.de/es/veh%C3%ADculos/buscar.html?"+q;}
 function uMN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo(),mId=m?(MID[m]||""):"";var kw=(m+" "+mo).trim();var q="demanda=n&orden=relevance&fromSearch=1";if(kw)q+="&s="+encodeURIComponent(kw);if(mId)q+="&marca="+mId;if(v("pMin"))q+="&desde="+v("pMin");if(v("pMax"))q+="&hasta="+v("pMax");if(v("aMin"))q+="&anod="+v("aMin");if(v("aMax"))q+="&anoh="+v("aMax");if(v("kmMax"))q+="&kilometersTo="+v("kmMax");return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;}
 function uPark(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();return "https://www.theparking.eu/used-cars/"+(m?slug(m)+(mo?"-"+slug(mo):""):"coches")+".html";}
 
