@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER="v73";
+var VER="v74";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -86,8 +86,9 @@ var MARCAS=Object.keys(MM);
 var MID={"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 
 var CNMAKE={"Tesla":"1354","BMW":"5","Mercedes":"34","Audi":"4","Volkswagen":"63","Seat":"51","Renault":"47","Peugeot":"41","Opel":"40","Ford":"15","Citroën":"8","Fiat":"14","Toyota":"58","Nissan":"39","Hyundai":"19","Kia":"24","Skoda":"52","Volvo":"64","Porsche":"44","Mini":"37","Suzuki":"57","Honda":"18","Mazda":"33","Dacia":"29","Cupra":"76","Jeep":"22","Land Rover":"27","Jaguar":"21","Lexus":"28","Mitsubishi":"36","Subaru":"56","Smart":"53","Alfa Romeo":"1","Lancia":"25","Maserati":"32","Ferrari":"13","Lamborghini":"26","Aston Martin":"3","Bentley":"6","McLaren":"73","Rolls-Royce":"48","Alpine":"83","DS":"75","MG":"72","Polestar":"85","SsangYong":"55","Infiniti":"61"};
-var CNMODEL={"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174"};return document.getElementById(id).value;}
-function modelo(){return (v("txtModelo")||"").trim()||v("selModelo")||"";}
+var CNMODEL={"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174"};
+
+function v(id){return document.getElementById(id).value;}return (v("txtModelo")||"").trim()||v("selModelo")||"";}
 function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function pp(val){if(typeof val==="number")return Math.round(val);if(!val)return 0;var m=String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
 function ay(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
