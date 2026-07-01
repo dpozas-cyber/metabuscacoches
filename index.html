@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER="v71";
+var VER="v72";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -255,11 +255,17 @@ function addMila(){
   actor("zen-studio~milanuncios-scraper",{text:kw,maxResults:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
     if(d[0])log("🔬 MN[0]: "+JSON.stringify(d[0]).slice(0,500));
     var antes=res.length;
+    var mo2=modelo().toLowerCase();
     d.slice(0,40).forEach(function(it){
       var att=it.attributes||{};
       var titulo=(it.title||it.name||kw||"Sin título").slice(0,70);
+      // filtrar resultados no relacionados
+      if(mo2&&titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(mo2.replace(/[\s\-]/g,""))===-1)return;
       var url=(it.url||it.listingUrl||"").replace(/^https?:\/\/[^/]*metabuscacoches[^/]*/,"https://www.milanuncios.com");
       if(!url||url.indexOf("milanuncios")===-1)url=uMN();
+      var img=null;
+      if(it.images&&it.images.length>0)img=it.images[0].url||it.images[0];
+      if(!img)img=it.image||it.imageUrl||null;
       res.push({
         titulo:titulo,
         precio:pp(it.price||it.salePrice||0),
@@ -268,7 +274,7 @@ function addMila(){
         portal:"Milanuncios",color:"#e67e22",
         url:url,
         descripcion:[(att.fuel&&att.fuel.formatted),(att.transmission&&att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
-        imagen:it.image||it.imageUrl||(it.images&&it.images[0])||null,
+        imagen:img,
         _marca:(it.brand||it.make||m||"").toLowerCase(),
         _modelo:(it.model||titulo).toLowerCase()
       });
