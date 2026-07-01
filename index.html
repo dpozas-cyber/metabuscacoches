@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v60";
+var VER="v61";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -243,15 +243,17 @@ function addMila(){
     log("🔬 MN cards encontradas: "+cards.length+" / html len: "+html.length);
     var antes=res.length;
     cards.forEach(function(c){
-      var tEl=c.querySelector('h2,h3,[class*="Title"]');
+      var tEl=c.querySelector('h2,h3,[class*="Title"],[class*="title"]');
       var pEl=c.querySelector('[class*="Price"],[class*="price"]');
       var aEl=c.querySelector('a[href*="/"]');
       if(!tEl||!aEl)return;
       var href=aEl.getAttribute("href")||"";
       if(href.indexOf("http")!==0)href="https://www.milanuncios.com"+href;
-      var kmM=(c.textContent||"").match(/([\d.]+)\s*kms?/i);
-      var anoM=(c.textContent||"").match(/\b(19|20)\d{2}\b/);
-      res.push({titulo:tEl.textContent.trim().slice(0,70),precio:pEl?pp(pEl.textContent):0,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:ay(anoM?anoM[0]:0),portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null,_marca:"",_modelo:""});
+      var txt=c.textContent||"";
+      var kmM=txt.match(/([\d.]+)\s*km/i);
+      var anoM=txt.match(/\b(19|20)\d{2}\b/);
+      var titulo=tEl.textContent.trim().slice(0,70);
+      res.push({titulo:titulo,precio:pEl?pp(pEl.textContent):0,km:kmM?parseInt(kmM[1].replace(/\./g,""),10):0,ano:ay(anoM?anoM[0]:0),portal:"Milanuncios",color:"#e67e22",url:href,descripcion:"",imagen:(c.querySelector("img")||{}).src||null,_marca:"",_modelo:titulo.toLowerCase()});
     });
     var n=res.length-antes;
     log("📦 Milanuncios: "+n+" encontrados");
@@ -288,7 +290,7 @@ function buscar(){
 function render(){
   var ord=v("ord"),mo=modelo().toLowerCase(),seen={};
   var arr=res.filter(function(r){
-    var key=(r.titulo+"|"+r.precio+"|"+r.km+"|"+r.ano).toLowerCase();
+    var key=(r.portal.split(" ")[0]+"|"+r.titulo+"|"+r.precio+"|"+r.km+"|"+r.ano).toLowerCase();
     if(seen[key])return false;seen[key]=true;
     if(mo&&!matchModelo(r,mo))return false;
     return true;
