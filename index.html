@@ -79,7 +79,7 @@ h1{font-size:19px;font-weight:700}
 
 <script>
 "use strict";
-var VER="v67";
+var VER="v68";
 var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY="https://metabuscador.dpozas.workers.dev";
 var res=[];
@@ -241,16 +241,15 @@ function addMila(){
   btn.disabled=true;btn.textContent="⏳ Milanuncios...";
   log("🚀 Milanuncios (actor)...");
   var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
-  var kw=(m+" "+mo).trim();
-  var input={start_urls:[{url:uMN()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}};
-  actor("lexis-solutions~milanuncios-cars-scraper",input).then(function(d){
+  var kw=(m+" "+mo).trim()||m||"coche";
+  actor("zen-studio~milanuncios-scraper",{text:kw,maxResults:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
     if(d[0])log("🔬 MN keys: "+Object.keys(d[0]).join(", "));
     var antes=res.length;
     d.slice(0,40).forEach(function(it){
       var titulo=(it.title||it.name||kw||"Sin título").slice(0,70);
       res.push({
         titulo:titulo,
-        precio:pp(it.price||it.sale_price||0),
+        precio:pp(it.price||it.salePrice||0),
         km:pp(it.mileage||it.km||0),
         ano:ay(it.year||it.modelYear||0),
         portal:"Milanuncios",color:"#e67e22",
@@ -266,22 +265,8 @@ function addMila(){
     btn.disabled=false;btn.textContent=n>0?"✓ Milanuncios":"➕ Milanuncios";
     if(n>0)render();
   }).catch(function(e){
-    log("❌ Milanuncios actor: "+e.message+", intentando zen-studio...");
-    actor("zen-studio~milanuncios-scraper",{text:kw,category:"coches",maxResults:40}).then(function(d){
-      if(d[0])log("🔬 MN zen keys: "+Object.keys(d[0]).join(", "));
-      var antes=res.length;
-      d.slice(0,40).forEach(function(it){
-        var titulo=(it.title||it.name||kw||"Sin título").slice(0,70);
-        res.push({titulo:titulo,precio:pp(it.price||0),km:pp(it.mileage||it.km||0),ano:ay(it.year||0),portal:"Milanuncios",color:"#e67e22",url:it.url||uMN(),descripcion:"",imagen:it.image||null,_marca:m.toLowerCase(),_modelo:(it.model||titulo).toLowerCase()});
-      });
-      var n=res.length-antes;
-      log("📦 Milanuncios: "+n+" encontrados");
-      btn.disabled=false;btn.textContent=n>0?"✓ Milanuncios":"➕ Milanuncios";
-      if(n>0)render();
-    }).catch(function(e2){
-      log("❌ Milanuncios: "+e2.message);
-      btn.disabled=false;btn.textContent="➕ Milanuncios";
-    });
+    log("❌ Milanuncios: "+e.message);
+    btn.disabled=false;btn.textContent="➕ Milanuncios";
   });
 }
 
