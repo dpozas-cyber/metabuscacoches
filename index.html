@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -226,6 +224,7 @@ function uAC() {
   if (v("kmMax")) q += (q?"&":"") + "kmhasta=" + v("kmMax");
   return "https://www.autocasion.com/coches-segunda-mano" + (q ? "?" + q : "");
 }
+function uPark() {
   var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
   return "https://www.theparking.eu/used-cars/" + (m ? slug(m) + (mo ? "-" + slug(mo) : "") : "coches") + ".html";
 }
@@ -344,7 +343,6 @@ function buscar() {
   document.getElementById("log").innerHTML = "";
   document.getElementById("lista").innerHTML = "";
   document.getElementById("orden").className = "hidden";
-  document.getElementById("lnkMN").href = uMN();
   document.getElementById("lnkMN").href = uMN();
   document.getElementById("lnkP").href = uPark();
   var estado = document.getElementById("estado");
