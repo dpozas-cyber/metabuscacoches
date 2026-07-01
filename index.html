@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,10 +34,10 @@ h1{font-size:19px;font-weight:700}
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="logo">🔍</div>
+    <div class="logo">&#128269;</div>
     <div>
       <h1>El Super Buscador</h1>
-      <p class="sub">AutoScout24 · Wallapop · Coches.net · mobile.de · <b id="ver"></b></p>
+      <p class="sub">AutoScout24 &middot; Wallapop &middot; Coches.net &middot; mobile.de &middot; <b id="ver"></b></p>
     </div>
   </div>
   <div class="card">
@@ -43,309 +45,376 @@ h1{font-size:19px;font-weight:700}
       <div><label class="lbl">Marca</label><select class="inp" id="selMarca" onchange="onMarca()"></select></div>
       <div><label class="lbl">Modelo</label><select class="inp" id="selModelo"><option value="">Cualquiera</option></select></div>
       <div style="grid-column:span 2"><label class="lbl">O escribe el modelo (tiene prioridad)</label><input class="inp" id="txtModelo" placeholder="Ej: Barchetta, Multipla..." oninput="if(res.length)render()"></div>
-      <div><label class="lbl">Precio desde (€)</label><input type="number" class="inp" id="pMin" placeholder="0"></div>
-      <div><label class="lbl">Precio hasta (€)</label><input type="number" class="inp" id="pMax" placeholder="20.000"></div>
+      <div><label class="lbl">Precio desde (&euro;)</label><input type="number" class="inp" id="pMin" placeholder="0"></div>
+      <div><label class="lbl">Precio hasta (&euro;)</label><input type="number" class="inp" id="pMax" placeholder="20.000"></div>
     </div>
     <div class="grid3" style="margin-top:12px">
-      <div><label class="lbl">Año desde</label><input type="number" class="inp" id="aMin" placeholder="2015"></div>
-      <div><label class="lbl">Año hasta</label><input type="number" class="inp" id="aMax" placeholder="2024"></div>
-      <div><label class="lbl">Km máximos</label><input type="number" class="inp" id="kmMax" placeholder="100.000"></div>
+      <div><label class="lbl">A&ntilde;o desde</label><input type="number" class="inp" id="aMin" placeholder="2015"></div>
+      <div><label class="lbl">A&ntilde;o hasta</label><input type="number" class="inp" id="aMax" placeholder="2024"></div>
+      <div><label class="lbl">Km m&aacute;ximos</label><input type="number" class="inp" id="kmMax" placeholder="100.000"></div>
     </div>
     <div style="margin-top:10px;display:flex;align-items:center;gap:6px">
       <input type="checkbox" id="chkEuropa" style="width:16px;height:16px">
-      <label for="chkEuropa" style="font-size:13px;color:#4a5568">🌍 Búsqueda europea (AutoScout24 y mobile.de)</label>
+      <label for="chkEuropa" style="font-size:13px;color:#4a5568">&#127757; B&uacute;squeda europea (AutoScout24 y mobile.de)</label>
     </div>
-    <button class="btn-main" id="btnB" style="margin-top:14px" onclick="buscar()">🔎 Buscar</button>
+    <button class="btn-main" id="btnB" style="margin-top:14px" onclick="buscar()">&#128270; Buscar</button>
   </div>
   <div id="orden" class="hidden" style="margin-bottom:12px">
     <select class="inp" id="ord" onchange="render()">
-      <option value="p_asc">💰 Precio: menor primero</option>
-      <option value="p_desc">💰 Precio: mayor primero</option>
-      <option value="km_asc">🛣️ Menos kilómetros</option>
-      <option value="a_desc">📅 Más nuevos primero</option>
+      <option value="p_asc">Precio: menor primero</option>
+      <option value="p_desc">Precio: mayor primero</option>
+      <option value="km_asc">Menos kil&oacute;metros</option>
+      <option value="a_desc">M&aacute;s nuevos primero</option>
     </select>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="extra-btn" id="btnM" style="color:#e67e22;border-color:#e67e22" onclick="addMila()">➕ Milanuncios</button>
-      <a class="extra-btn" id="lnkP" style="color:#e91e63;border-color:#e91e63" href="#" target="_blank">🔗 The Parking</a>
+      <button class="extra-btn" id="btnM" style="color:#e67e22;border-color:#e67e22" onclick="addMila()">+ Milanuncios</button>
+      <a class="extra-btn" id="lnkP" style="color:#e91e63;border-color:#e91e63" href="#" target="_blank">The Parking</a>
     </div>
   </div>
-  <div id="estado" class="empty"><div style="font-size:40px">🚗</div><p style="font-weight:600;color:#718096">Configura los filtros y pulsa Buscar</p></div>
+  <div id="estado" class="empty"><div style="font-size:40px">&#128663;</div><p style="font-weight:600;color:#718096">Configura los filtros y pulsa Buscar</p></div>
   <div id="lista"></div>
   <div id="log" class="log hidden"></div>
 </div>
 <script>
 "use strict";
-var VER="v74";
-var TOKEN="apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
-var PROXY="https://metabuscador.dpozas.workers.dev";
-var res=[];
-var MDKEY={};
+var VER = "v75";
+var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
+var PROXY = "https://metabuscador.dpozas.workers.dev";
+var res = [];
+var MDKEY = {};
 
-var MM={"Cualquiera":[],"Abarth":["595","595 Competizione","695","124 Spider","500e"],"Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","Junior","147","156","159","166","Brera","Mito","GT","GTV","Spider","4C"],"Alpine":["A110","A290"],"Aston Martin":["DB11","DB12","DBS","DBX","Vantage","Vanquish","Rapide"],"Audi":["A1","A1 Sportback","A2","A3","A3 Sportback","A4","A4 Avant","A4 Allroad","A5","A5 Sportback","A6","A6 Avant","A6 Allroad","A7","A8","Q2","Q3","Q3 Sportback","Q4 e-tron","Q5","Q5 Sportback","Q6 e-tron","Q7","Q8","Q8 e-tron","R8","RS3","RS4","RS5","RS6","RS7","RS Q3","RS Q8","RS e-tron GT","S1","S3","S4","S5","S6","S7","S8","SQ5","SQ7","SQ8","TT","TT RS","TTS","e-tron","e-tron GT"],"Bentley":["Bentayga","Continental GT","Flying Spur"],"BMW":["Serie 1","116i","118i","118d","120i","120d","M135i","Serie 2","218i","220i","220d","M240i","Serie 3","318d","320i","320d","330i","330d","330e","M340i","M3","Serie 4","420i","420d","430i","440i","M4","Serie 5","520i","520d","530i","530d","530e","540i","M5","Serie 6","Serie 7","730d","740i","750i","Serie 8","840i","M8","X1","X2","X3","X3 M","X4","X4 M","X5","X5 M","X6","X6 M","X7","XM","Z4","i3","i4","i5","i7","iX","iX1","iX2","iX3"],"Citroën":["C1","C2","C3","C3 Aircross","C3 Picasso","C4","C4 Cactus","C4 Picasso","C4 X","C5","C5 Aircross","C5 X","C6","C8","Berlingo","DS3","Grand C4 Picasso","Jumpy","Nemo","ë-C4"],"Cupra":["Ateca","Born","Formentor","Leon","Tavascan","Terramar"],"Dacia":["Dokker","Duster","Jogger","Lodgy","Logan","Sandero","Sandero Stepway","Spring"],"DS":["DS3","DS3 Crossback","DS4","DS5","DS7","DS7 Crossback","DS9"],"Ferrari":["296 GTB","458 Italia","488 GTB","812 Superfast","F8 Tributo","California","Portofino","Roma","SF90 Stradale","Purosangue","Daytona SP3"],"Fiat":["500","500C","500e","500L","500X","600","Bravo","Doblo","Freemont","Grande Punto","Panda","Panda 4x4","Punto","Qubo","Tipo","Tipo SW","Ulysse"],"Ford":["B-Max","C-Max","EcoSport","Edge","Explorer","Fiesta","Fiesta ST","Focus","Focus ST","Focus RS","Galaxy","Ka","Kuga","Kuga PHEV","Mondeo","Mustang","Mustang Mach-E","Puma","Puma ST","Ranger","Ranger Raptor","S-Max","Tourneo","Transit","Transit Custom"],"Honda":["Accord","Civic","Civic Type R","CR-V","CR-Z","HR-V","Insight","Jazz","Legend","NSX","ZR-V","e","e:Ny1"],"Hyundai":["i10","i20","i20 N","i30","i30 N","i30 Fastback","i40","ix20","ix35","Bayon","Ioniq","Ioniq 5","Ioniq 5 N","Ioniq 6","Kona","Kona Electric","Kona N","Nexo","Santa Fe","Tucson","Tucson PHEV"],"Infiniti":["Q30","Q50","Q60","QX30","QX50","QX70"],"Jaguar":["E-Pace","F-Pace","F-Pace SVR","F-Type","F-Type R","I-Pace","XE","XF","XJ","XK"],"Jeep":["Avenger","Cherokee","Commander","Compass","Compass 4xe","Grand Cherokee","Renegade","Renegade 4xe","Wrangler","Wrangler 4xe"],"Kia":["Carens","Ceed","Ceed GT","cee'd","EV6","EV6 GT","EV9","Niro","Niro EV","Optima","Picanto","ProCeed","Rio","Sorento","Soul","Sportage","Sportage PHEV","Stinger","Stonic","Venga","Xceed"],"Lamborghini":["Aventador","Gallardo","Huracán","Urus","Revuelto"],"Lancia":["Delta","Musa","Ypsilon"],"Land Rover":["Defender","Defender 90","Defender 110","Discovery","Discovery Sport","Freelander","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],"Lexus":["CT 200h","ES 300h","IS 300h","LC 500","LS 500h","NX 300h","NX 350h","NX 450h+","RC 300h","RX 450h","RX 500h","UX 250h","UX 300e"],"Maserati":["Ghibli","GranTurismo","GranCabrio","Grecale","Levante","MC20","Quattroporte"],"Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","CX-80","MX-5","MX-30","RX-8"],"McLaren":["540C","570S","600LT","720S","750S","Artura","GT"],"Mercedes":["Clase A","A 180","A 200","A 220","A 250","A 35 AMG","A 45 AMG","Clase B","B 180","B 200","Clase C","C 180","C 200","C 220 d","C 300","C 43 AMG","C 63 AMG","Clase E","E 200","E 220 d","E 300","E 53 AMG","E 63 AMG","Clase S","S 350 d","S 400","S 500","S 580","S 63 AMG","CLA","CLA 200","CLA 220 d","CLA 35 AMG","CLA 45 AMG","CLE","CLS","CLS 350","GLA","GLA 200","GLA 35 AMG","GLB","GLB 200","GLC","GLC 200","GLC 220 d","GLC 300","GLC 43 AMG","GLE","GLE 300 d","GLE 350","GLE 53 AMG","GLS","GLS 400 d","Clase G","G 500","G 63 AMG","EQA","EQB","EQC","EQE","EQS","EQV","SL","SL 500","SLC","AMG GT","Citan","Vito","Clase V","V 220 d","V 300 d"],"MG":["3","4","5","HS","HS PHEV","Marvel R","MG3 Hybrid","ZS","ZS EV","Cyberster"],"Mini":["Cooper","Cooper S","Cooper SE","Cabrio","Clubman","Clubman JCW","Countryman","Countryman JCW","JCW","One","Paceman","Roadster"],"Mitsubishi":["ASX","Eclipse Cross","L200","Lancer","Montero","Outlander","Outlander PHEV","Pajero","Space Star"],"Nissan":["350Z","370Z","Ariya","GT-R","Juke","Leaf","Micra","Murano","Navara","Note","NV200","Pulsar","Qashqai","Townstar","X-Trail"],"Opel":["Adam","Astra","Astra Electric","Combo","Corsa","Corsa-e","Crossland","Grandland","Insignia","Karl","Meriva","Mokka","Mokka-e","Vivaro","Zafira"],"Peugeot":["108","208","208 e","2008","2008 e","3008","3008 Hybrid","301","308","308 GTi","308 SW","408","408 PHEV","5008","508","508 PHEV","Partner","Rifter","RCZ","Traveller"],"Polestar":["1","2","3","4"],"Porsche":["718 Boxster","718 Cayman","718 Cayman GT4","911 Carrera","911 Carrera S","911 GT3","911 GT3 RS","911 Turbo","911 Turbo S","Cayenne","Cayenne E-Hybrid","Cayenne GTS","Cayenne Turbo","Macan","Macan S","Macan Turbo","Macan EV","Panamera","Taycan","Taycan 4S","Taycan Turbo"],"Renault":["Arkana","Austral","Captur","Clio","Clio E-Tech","Clio RS","Espace","Kadjar","Kangoo","Koleos","Laguna","Megane","Megane RS","Megane E-Tech","Modus","Scenic","Scenic E-Tech","Talisman","Twingo","Twizy","Zoe"],"Rolls-Royce":["Cullinan","Ghost","Phantom","Spectre","Wraith"],"Seat":["Alhambra","Arona","Ateca","Exeo","Ibiza","Ibiza FR","Leon","Leon FR","Leon Cupra","Mii","Tarraco","Toledo"],"Skoda":["Citigo","Enyaq","Enyaq iV 80","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Octavia RS","Rapid","Roomster","Scala","Superb","Yeti"],"Smart":["#1","#3","ForTwo","ForFour","EQ ForTwo","EQ ForFour","Roadster"],"SsangYong":["Korando","Musso","Rexton","Tivoli","Torres","XLV"],"Subaru":["BRZ","Forester","Impreza","Legacy","Levorg","Outback","Solterra","WRX STI","XV"],"Suzuki":["Across","Baleno","Celerio","Grand Vitara","Ignis","Jimny","S-Cross","Swift","Swift Sport","SX4 S-Cross","Vitara"],"Tesla":["Model 3","Model 3 Long Range","Model 3 Performance","Model S","Model S Plaid","Model X","Model Y","Model Y Long Range","Model Y Performance","Cybertruck","Roadster"],"Toyota":["Auris","Aygo","Aygo X","bZ4X","C-HR","C-HR Hybrid","Camry","Corolla","Corolla GR","Corolla Touring Sports","GR86","GR Supra","GR Yaris","Hilux","Land Cruiser","Mirai","Prius","Proace","RAV4","RAV4 Hybrid","RAV4 PHEV","Verso","Yaris","Yaris Cross","Yaris GR"],"Volkswagen":["Amarok","Arteon","Beetle","Caddy","Golf","Golf GTI","Golf GTD","Golf GTE","Golf R","Golf Variant","ID.3","ID.4","ID.4 GTX","ID.5","ID.7","ID. Buzz","Multivan","Passat","Passat GTE","Passat Variant","Polo","Polo GTI","Scirocco","Sharan","T-Cross","T-Roc","T-Roc R","Taigo","Tiguan","Tiguan Allspace","Touareg","Touran","Up"],"Volvo":["C30","C40 Recharge","EX30","EX40","EX90","S60","S90","V40","V60","V60 Cross Country","V90","V90 Cross Country","XC40","XC40 Recharge","XC60","XC60 Recharge","XC90","XC90 Recharge"]};
-var MARCAS=Object.keys(MM);
-var MID={"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroën":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
+var MM = {"Cualquiera":[],"Abarth":["595","695","124 Spider"],"Alfa Romeo":["Giulia","Giulietta","Stelvio","Tonale","147","156","159","Brera","Mito","GT","Spider","4C"],"Alpine":["A110","A290"],"Aston Martin":["DB11","DB12","DBS","DBX","Vantage"],"Audi":["A1","A2","A3","A3 Sportback","A4","A4 Avant","A5","A5 Sportback","A6","A6 Avant","A7","A8","Q2","Q3","Q4 e-tron","Q5","Q7","Q8","R8","RS3","RS4","RS5","RS6","RS7","S3","S4","S5","S6","TT","e-tron","e-tron GT"],"Bentley":["Bentayga","Continental GT","Flying Spur"],"BMW":["Serie 1","Serie 2","Serie 3","Serie 4","Serie 5","Serie 7","Serie 8","X1","X2","X3","X4","X5","X6","X7","Z4","i3","i4","i5","i7","iX","M3","M4","M5"],"Citroen":["C1","C2","C3","C3 Aircross","C4","C4 Cactus","C5","C5 Aircross","Berlingo"],"Cupra":["Ateca","Born","Formentor","Leon","Tavascan"],"Dacia":["Duster","Jogger","Logan","Sandero","Spring"],"DS":["DS3","DS4","DS5","DS7","DS9"],"Ferrari":["296 GTB","458","488","812","F8","California","Portofino","Roma","SF90","Purosangue"],"Fiat":["500","500C","500e","500L","500X","Bravo","Panda","Punto","Tipo"],"Ford":["Fiesta","Fiesta ST","Focus","Focus ST","Galaxy","Kuga","Mondeo","Mustang","Mustang Mach-E","Puma","Ranger","S-Max"],"Honda":["Civic","Civic Type R","CR-V","HR-V","Jazz","NSX","ZR-V","e"],"Hyundai":["i10","i20","i30","i30 N","Ioniq 5","Ioniq 6","Kona","Santa Fe","Tucson"],"Infiniti":["Q30","Q50","Q60","QX30","QX50","QX70"],"Jaguar":["E-Pace","F-Pace","F-Type","I-Pace","XE","XF","XJ"],"Jeep":["Avenger","Cherokee","Compass","Grand Cherokee","Renegade","Wrangler"],"Kia":["Ceed","EV6","EV9","Niro","Picanto","ProCeed","Sorento","Sportage","Stinger","Xceed"],"Lamborghini":["Aventador","Gallardo","Huracan","Urus","Revuelto"],"Lancia":["Delta","Ypsilon"],"Land Rover":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],"Lexus":["CT 200h","ES 300h","IS 300h","LC 500","NX 300h","NX 450h","RX 450h","UX 250h","UX 300e"],"Maserati":["Ghibli","GranTurismo","Grecale","Levante","MC20","Quattroporte"],"Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","MX-5","MX-30"],"McLaren":["570S","720S","750S","Artura","GT"],"Mercedes":["Clase A","Clase B","Clase C","Clase E","Clase S","CLA","CLE","CLS","GLA","GLB","GLC","GLE","GLS","Clase G","EQA","EQB","EQC","EQE","EQS","SL","AMG GT","Vito","Clase V"],"MG":["HS","ZS","ZS EV","Cyberster"],"Mini":["Cooper","Cooper S","Cooper SE","Cabrio","Clubman","Countryman","JCW","One"],"Mitsubishi":["ASX","Eclipse Cross","Outlander","Outlander PHEV"],"Nissan":["370Z","Ariya","Juke","Leaf","Micra","Navara","Qashqai","X-Trail"],"Opel":["Astra","Corsa","Corsa-e","Crossland","Grandland","Insignia","Mokka","Mokka-e"],"Peugeot":["208","208 e","2008","3008","308","408","508","5008","RCZ"],"Polestar":["1","2","3","4"],"Porsche":["718 Boxster","718 Cayman","911 Carrera","911 GT3","911 Turbo","Cayenne","Macan","Panamera","Taycan"],"Renault":["Arkana","Austral","Captur","Clio","Espace","Kadjar","Kangoo","Megane","Scenic","Zoe"],"Rolls-Royce":["Cullinan","Ghost","Phantom","Spectre","Wraith"],"Seat":["Alhambra","Arona","Ateca","Ibiza","Leon","Mii","Tarraco","Toledo"],"Skoda":["Enyaq","Fabia","Kamiq","Karoq","Kodiaq","Octavia","Octavia RS","Superb","Yeti"],"Smart":["ForTwo","ForFour","EQ ForTwo"],"SsangYong":["Korando","Musso","Rexton","Tivoli","Torres"],"Subaru":["BRZ","Forester","Impreza","Outback","Solterra","WRX STI","XV"],"Suzuki":["Ignis","Jimny","S-Cross","Swift","Vitara"],"Tesla":["Model 3","Model 3 Long Range","Model 3 Performance","Model S","Model S Plaid","Model X","Model Y","Model Y Long Range","Model Y Performance","Cybertruck"],"Toyota":["Aygo","Aygo X","bZ4X","C-HR","Corolla","GR Supra","GR Yaris","Land Cruiser","Prius","RAV4","RAV4 Hybrid","Yaris","Yaris GR"],"Volkswagen":["Golf","Golf GTI","Golf R","Golf Variant","ID.3","ID.4","ID.5","ID.7","ID. Buzz","Passat","Polo","Polo GTI","T-Cross","T-Roc","Tiguan","Touareg","Touran","Up"],"Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V60","V90","XC40","XC60","XC90"]};
 
-var CNMAKE={"Tesla":"1354","BMW":"5","Mercedes":"34","Audi":"4","Volkswagen":"63","Seat":"51","Renault":"47","Peugeot":"41","Opel":"40","Ford":"15","Citroën":"8","Fiat":"14","Toyota":"58","Nissan":"39","Hyundai":"19","Kia":"24","Skoda":"52","Volvo":"64","Porsche":"44","Mini":"37","Suzuki":"57","Honda":"18","Mazda":"33","Dacia":"29","Cupra":"76","Jeep":"22","Land Rover":"27","Jaguar":"21","Lexus":"28","Mitsubishi":"36","Subaru":"56","Smart":"53","Alfa Romeo":"1","Lancia":"25","Maserati":"32","Ferrari":"13","Lamborghini":"26","Aston Martin":"3","Bentley":"6","McLaren":"73","Rolls-Royce":"48","Alpine":"83","DS":"75","MG":"72","Polestar":"85","SsangYong":"55","Infiniti":"61"};
-var CNMODEL={"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174"};
+var MARCAS = Object.keys(MM);
 
-function v(id){return document.getElementById(id).value;}return (v("txtModelo")||"").trim()||v("selModelo")||"";}
-function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
-function pp(val){if(typeof val==="number")return Math.round(val);if(!val)return 0;var m=String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/);return m?parseInt(m[1],10):0;}
-function ay(a){a=parseInt(a,10)||0;return(a>=1950&&a<=2026)?a:0;}
-function log(msg){var el=document.getElementById("log");el.className="log";el.style.display="block";var p=document.createElement("p");p.textContent=new Date().toLocaleTimeString()+": "+msg;el.appendChild(p);}
+var MID = {"Abarth":"82","Alfa Romeo":"1","Alpine":"83","Aston Martin":"3","Audi":"4","Bentley":"6","BMW":"5","Citroen":"8","Cupra":"76","Dacia":"29","DS":"75","Ferrari":"13","Fiat":"14","Ford":"15","Honda":"18","Hyundai":"19","Infiniti":"61","Jaguar":"21","Jeep":"22","Kia":"24","Lamborghini":"26","Lancia":"25","Land Rover":"27","Lexus":"28","Maserati":"32","Mazda":"33","McLaren":"73","Mercedes":"34","MG":"72","Mini":"37","Mitsubishi":"36","Nissan":"39","Opel":"40","Peugeot":"41","Polestar":"85","Porsche":"44","Renault":"47","Rolls-Royce":"48","Seat":"51","Skoda":"52","Smart":"53","SsangYong":"55","Subaru":"56","Suzuki":"57","Tesla":"68","Toyota":"58","Volkswagen":"63","Volvo":"64"};
 
-function onMarca(){
-  var sel=document.getElementById("selModelo");
-  sel.innerHTML="<option value=''>Cargando modelos...</option>";
-  sel.disabled=true;
-  var m=v("selMarca");
-  if(m==="Cualquiera"){sel.innerHTML="<option value=''>Cualquiera</option>";sel.disabled=false;return;}
-  var key=MDKEY[m];
-  if(!key){
-    sel.innerHTML="<option value=''>Cualquiera</option>";
-    (MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
-    sel.disabled=false;return;
+var CNMAKE = {"Tesla":"1354","BMW":"5","Mercedes":"34","Audi":"4","Volkswagen":"63","Seat":"51","Renault":"47","Peugeot":"41","Opel":"40","Ford":"15","Citroen":"8","Fiat":"14","Toyota":"58","Nissan":"39","Hyundai":"19","Kia":"24","Skoda":"52","Volvo":"64","Porsche":"44","Mini":"37","Suzuki":"57","Honda":"18","Mazda":"33","Dacia":"29","Cupra":"76","Jeep":"22","Land Rover":"27","Jaguar":"21","Lexus":"28","Mitsubishi":"36","Subaru":"56","Smart":"53","Alfa Romeo":"1","Lancia":"25","Maserati":"32","Ferrari":"13","Lamborghini":"26","Aston Martin":"3","Bentley":"6","McLaren":"73","Rolls-Royce":"48","Alpine":"83","DS":"75","MG":"72","Polestar":"85","SsangYong":"55","Infiniti":"61"};
+
+var CNMODEL = {"Tesla Model S":"1171","Tesla Model 3":"1172","Tesla Model X":"1173","Tesla Model Y":"1174"};
+
+function v(id) { return document.getElementById(id).value; }
+function modelo() { return (v("txtModelo") || "").trim() || v("selModelo") || ""; }
+function slug(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function pp(val) { if (typeof val === "number") return Math.round(val); if (!val) return 0; var m = String(val).replace(/[.\s\u00a0]/g,"").match(/(\d{2,8})/); return m ? parseInt(m[1],10) : 0; }
+function ay(a) { a = parseInt(a,10) || 0; return (a >= 1950 && a <= 2026) ? a : 0; }
+function log(msg) { var el = document.getElementById("log"); el.className = "log"; el.style.display = "block"; var p = document.createElement("p"); p.textContent = new Date().toLocaleTimeString() + ": " + msg; el.appendChild(p); }
+
+function onMarca() {
+  var sel = document.getElementById("selModelo");
+  sel.innerHTML = "<option value=''>Cargando...</option>";
+  sel.disabled = true;
+  var m = v("selMarca");
+  if (m === "Cualquiera") { sel.innerHTML = "<option value=''>Cualquiera</option>"; sel.disabled = false; return; }
+  var key = MDKEY[m];
+  if (!key) {
+    sel.innerHTML = "<option value=''>Cualquiera</option>";
+    (MM[m] || []).forEach(function(x) { var o = document.createElement("option"); o.textContent = x; sel.appendChild(o); });
+    sel.disabled = false; return;
   }
-  fetch(PROXY+"/https://services.mobile.de/refdata/classes/Car/makes/"+encodeURIComponent(key)+"/models")
-    .then(function(r){return r.json();})
-    .then(function(j){
-      var items=(j.reference&&j.reference.item)||[];
-      sel.innerHTML="<option value=''>Cualquiera</option>";
-      var nombres=[];
-      items.forEach(function(it){var nom=it["local-description"]&&it["local-description"]["$"];if(nom&&nombres.indexOf(nom)===-1)nombres.push(nom);});
+  fetch(PROXY + "/https://services.mobile.de/refdata/classes/Car/makes/" + encodeURIComponent(key) + "/models")
+    .then(function(r) { return r.json(); })
+    .then(function(j) {
+      var items = (j.reference && j.reference.item) || [];
+      sel.innerHTML = "<option value=''>Cualquiera</option>";
+      var nombres = [];
+      items.forEach(function(it) { var n = it["local-description"] && it["local-description"]["$"]; if (n && nombres.indexOf(n) === -1) nombres.push(n); });
       nombres.sort();
-      nombres.forEach(function(nom){var o=document.createElement("option");o.textContent=nom;sel.appendChild(o);});
-      if(nombres.length===0&&MM[m])(MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
-      sel.disabled=false;
+      nombres.forEach(function(n) { var o = document.createElement("option"); o.textContent = n; sel.appendChild(o); });
+      if (nombres.length === 0 && MM[m]) (MM[m] || []).forEach(function(x) { var o = document.createElement("option"); o.textContent = x; sel.appendChild(o); });
+      sel.disabled = false;
     })
-    .catch(function(){
-      sel.innerHTML="<option value=''>Cualquiera</option>";
-      (MM[m]||[]).forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
-      sel.disabled=false;
+    .catch(function() {
+      sel.innerHTML = "<option value=''>Cualquiera</option>";
+      (MM[m] || []).forEach(function(x) { var o = document.createElement("option"); o.textContent = x; sel.appendChild(o); });
+      sel.disabled = false;
     });
 }
 
-function cargarMarcas(){
-  var sel=document.getElementById("selMarca");
-  fetch(PROXY+"/https://services.mobile.de/refdata/classes/Car/makes")
-    .then(function(r){return r.json();})
-    .then(function(j){
-      var items=(j.reference&&j.reference.item)||[];
-      MDKEY={};
-      var nombres=[];
-      items.forEach(function(it){var nom=it["local-description"]&&it["local-description"]["$"];var key=it["@key"];if(nom&&key&&nom!=="Otros"){MDKEY[nom]=key;nombres.push(nom);}});
+function cargarMarcas() {
+  var sel = document.getElementById("selMarca");
+  fetch(PROXY + "/https://services.mobile.de/refdata/classes/Car/makes")
+    .then(function(r) { return r.json(); })
+    .then(function(j) {
+      var items = (j.reference && j.reference.item) || [];
+      MDKEY = {};
+      var nombres = [];
+      items.forEach(function(it) { var n = it["local-description"] && it["local-description"]["$"]; var k = it["@key"]; if (n && k && n !== "Otros") { MDKEY[n] = k; nombres.push(n); } });
       nombres.sort();
-      sel.innerHTML="<option>Cualquiera</option>";
-      nombres.forEach(function(nom){var o=document.createElement("option");o.textContent=nom;sel.appendChild(o);});
-      log("✓ "+nombres.length+" marcas cargadas de mobile.de");
+      sel.innerHTML = "<option>Cualquiera</option>";
+      nombres.forEach(function(n) { var o = document.createElement("option"); o.textContent = n; sel.appendChild(o); });
+      log("OK " + nombres.length + " marcas cargadas");
     })
-    .catch(function(){
-      sel.innerHTML="";
-      MARCAS.forEach(function(m){var o=document.createElement("option");o.textContent=m;sel.appendChild(o);});
+    .catch(function() {
+      sel.innerHTML = "";
+      MARCAS.forEach(function(m) { var o = document.createElement("option"); o.textContent = m; sel.appendChild(o); });
     });
 }
 
-function uAS(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var paises=document.getElementById("chkEuropa").checked?"A,B,E,F,I,L,NL,D":"E";var q="atype=C&ustate=N,U&cy="+paises+"&sort=standard&size=20";if(v("pMin"))q+="&pricefrom="+v("pMin");if(v("pMax"))q+="&priceto="+v("pMax");if(v("aMin"))q+="&fregfrom="+v("aMin");if(v("aMax"))q+="&fregto="+v("aMax");if(v("kmMax"))q+="&kmto="+v("kmMax");return "https://www.autoscout24.es"+(m?"/lst/"+slug(m)+(mo?"/"+slug(mo):""):"/lst")+"?"+q;}
-function uWP(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var kw=(m+" "+mo).trim();var q="category_id=100&order_by=most_relevance";if(kw)q+="&keywords="+encodeURIComponent(kw);if(v("pMin"))q+="&min_sale_price="+v("pMin");if(v("pMax"))q+="&max_sale_price="+v("pMax");if(v("aMin"))q+="&min_year="+v("aMin");if(v("aMax"))q+="&max_year="+v("aMax");if(v("kmMax"))q+="&max_km="+v("kmMax");return "https://es.wallapop.com/search?"+q;}
-function uCN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();var mId=m?(CNMAKE[m]||""):"";var moId=m&&mo?(CNMODEL[m+" "+mo]||""):"";var q=mId?"MakeIds[0]="+mId:"";if(moId)q+=(q?"&":"")+"ModelIds[0]="+moId;if(v("pMin"))q+=(q?"&":"")+"MinPrice="+v("pMin");if(v("pMax"))q+=(q?"&":"")+"MaxPrice="+v("pMax");if(v("aMin"))q+=(q?"&":"")+"MinYear="+v("aMin");if(v("aMax"))q+=(q?"&":"")+"MaxYear="+v("aMax");if(v("kmMax"))q+=(q?"&":"")+"MaxKms="+v("kmMax");return "https://www.coches.net/search/"+(q?"?"+q:"");}
-function uMD(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),key=m?(MDKEY[m]||""):"";var europa=document.getElementById("chkEuropa").checked;var q="dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";if(!europa)q+="&cn=ES";if(key)q+="&mk="+encodeURIComponent(key);if(v("pMin")||v("pMax"))q+="&p="+(v("pMin")||"")+"%3A"+(v("pMax")||"");if(v("aMin")||v("aMax"))q+="&fr="+(v("aMin")||"")+"%3A"+(v("aMax")||"");if(v("kmMax"))q+="&ml=%3A"+v("kmMax");return "https://suchen.mobile.de/fahrzeuge/search.html?"+q;}
-function uMN(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo(),mId=m?(MID[m]||""):"";var kw=(m+" "+mo).trim();var q="demanda=n&orden=relevance&fromSearch=1";if(kw)q+="&s="+encodeURIComponent(kw);if(mId)q+="&marca="+mId;if(v("pMin"))q+="&desde="+v("pMin");if(v("pMax"))q+="&hasta="+v("pMax");if(v("aMin"))q+="&anod="+v("aMin");if(v("aMax"))q+="&anoh="+v("aMax");if(v("kmMax"))q+="&kilometersTo="+v("kmMax");return "https://www.milanuncios.com/coches-de-segunda-mano/?"+q;}
-function uPark(){var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();return "https://www.theparking.eu/used-cars/"+(m?slug(m)+(mo?"-"+slug(mo):""):"coches")+".html";}
-
-function actor(id,input){
-  log("🚀 "+id+"...");
-  return fetch("https://api.apify.com/v2/acts/"+id+"/run-sync-get-dataset-items?token="+TOKEN+"&timeout=120&memory=1024",{
-    method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input)
-  }).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error("HTTP "+r.status+": "+t.slice(0,120));});return r.json();})
-  .then(function(d){var a=Array.isArray(d)?d:[];log("📦 "+id+": "+a.length+" items");return a;});
+function uAS() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
+  var paises = document.getElementById("chkEuropa").checked ? "A,B,E,F,I,L,NL,D" : "E";
+  var q = "atype=C&ustate=N,U&cy=" + paises + "&sort=standard&size=20";
+  if (v("pMin")) q += "&pricefrom=" + v("pMin");
+  if (v("pMax")) q += "&priceto=" + v("pMax");
+  if (v("aMin")) q += "&fregfrom=" + v("aMin");
+  if (v("aMax")) q += "&fregto=" + v("aMax");
+  if (v("kmMax")) q += "&kmto=" + v("kmMax");
+  return "https://www.autoscout24.es" + (m ? "/lst/" + slug(m) + (mo ? "/" + slug(mo) : "") : "/lst") + "?" + q;
 }
 
-function precioDe(it){var p=it.price;if(p&&typeof p==="object"){p=p.price||p.amount||p.value||p.gross||p.gross_amount||p.consumerPriceGross||p.priceRaw||p.raw||0;}return pp(p||it.rawPrice||it.priceValue||it.netPrice||0);}
-function kmDe(it){var k=it.milage||it.mileage||it.km;if(!k&&it.attributes)k=it.attributes.km||it.attributes.mileage;if(!k&&it.properties)k=it.properties.mileage;return pp(k||0);}
-function anoDe(it){var a=it.year||it.firstRegistrationYear;if(!a&&it.firstRegistration)a=(String(it.firstRegistration).match(/(19|20)\d{2}/)||[])[0];if(!a&&it.attributes){var fr=it.attributes.year||it.attributes.firstRegistration;if(fr)a=(String(fr).match(/(19|20)\d{2}/)||[])[0];}return ay(a);}
+function uWP() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
+  var kw = (m + " " + mo).trim();
+  var q = "category_id=100&order_by=most_relevance";
+  if (kw) q += "&keywords=" + encodeURIComponent(kw);
+  if (v("pMin")) q += "&min_sale_price=" + v("pMin");
+  if (v("pMax")) q += "&max_sale_price=" + v("pMax");
+  if (v("aMin")) q += "&min_year=" + v("aMin");
+  if (v("aMax")) q += "&max_year=" + v("aMax");
+  if (v("kmMax")) q += "&max_km=" + v("kmMax");
+  return "https://es.wallapop.com/search?" + q;
+}
 
-function push(it,portal,color,fallbackUrl){
+function uCN() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
+  var mId = m ? (CNMAKE[m] || "") : "";
+  var moId = m && mo ? (CNMODEL[m + " " + mo] || "") : "";
+  var q = mId ? "MakeIds[0]=" + mId : "";
+  if (moId) q += (q ? "&" : "") + "ModelIds[0]=" + moId;
+  if (v("pMin")) q += (q ? "&" : "") + "MinPrice=" + v("pMin");
+  if (v("pMax")) q += (q ? "&" : "") + "MaxPrice=" + v("pMax");
+  if (v("aMin")) q += (q ? "&" : "") + "MinYear=" + v("aMin");
+  if (v("aMax")) q += (q ? "&" : "") + "MaxYear=" + v("aMax");
+  if (v("kmMax")) q += (q ? "&" : "") + "MaxKms=" + v("kmMax");
+  return "https://www.coches.net/search/" + (q ? "?" + q : "");
+}
+
+function uMD() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), key = m ? (MDKEY[m] || "") : "";
+  var europa = document.getElementById("chkEuropa").checked;
+  var q = "dam=false&isSearchRequest=true&s=Car&vc=Car&sb=rel";
+  if (!europa) q += "&cn=ES";
+  if (key) q += "&mk=" + encodeURIComponent(key);
+  if (v("pMin") || v("pMax")) q += "&p=" + (v("pMin") || "") + "%3A" + (v("pMax") || "");
+  if (v("aMin") || v("aMax")) q += "&fr=" + (v("aMin") || "") + "%3A" + (v("aMax") || "");
+  if (v("kmMax")) q += "&ml=%3A" + v("kmMax");
+  return "https://suchen.mobile.de/fahrzeuge/search.html?" + q;
+}
+
+function uMN() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo(), mId = m ? (MID[m] || "") : "";
+  var kw = (m + " " + mo).trim();
+  var q = "demanda=n&orden=relevance&fromSearch=1";
+  if (kw) q += "&s=" + encodeURIComponent(kw);
+  if (mId) q += "&marca=" + mId;
+  if (v("pMin")) q += "&desde=" + v("pMin");
+  if (v("pMax")) q += "&hasta=" + v("pMax");
+  if (v("aMin")) q += "&anod=" + v("aMin");
+  if (v("aMax")) q += "&anoh=" + v("aMax");
+  if (v("kmMax")) q += "&kilometersTo=" + v("kmMax");
+  return "https://www.milanuncios.com/coches-de-segunda-mano/?" + q;
+}
+
+function uPark() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
+  return "https://www.theparking.eu/used-cars/" + (m ? slug(m) + (mo ? "-" + slug(mo) : "") : "coches") + ".html";
+}
+
+function actor(id, input) {
+  log("Buscando en " + id + "...");
+  return fetch("https://api.apify.com/v2/acts/" + id + "/run-sync-get-dataset-items?token=" + TOKEN + "&timeout=120&memory=1024", {
+    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(input)
+  }).then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error("HTTP " + r.status + ": " + t.slice(0,120)); });
+    return r.json();
+  }).then(function(d) { var a = Array.isArray(d) ? d : []; log("Recibidos " + a.length + " de " + id); return a; });
+}
+
+function precioDe(it) { var p = it.price; if (p && typeof p === "object") { p = p.price || p.amount || p.value || p.gross || p.consumerPriceGross || p.raw || 0; } return pp(p || it.rawPrice || it.priceValue || it.netPrice || 0); }
+function kmDe(it) { var k = it.milage || it.mileage || it.km; if (!k && it.attributes) k = it.attributes.km || it.attributes.mileage; return pp(k || 0); }
+function anoDe(it) { var a = it.year || it.firstRegistrationYear; if (!a && it.firstRegistration) a = (String(it.firstRegistration).match(/(19|20)\d{2}/) || [])[0]; return ay(a); }
+
+function push(it, portal, color, fallbackUrl) {
   res.push({
-    titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
-    precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
-    portal:portal,color:color,
-    url:it.url||it.listingUrl||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:fallbackUrl),
-    descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
-    imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null,
-    _marca:(it.manufacturer||it.make||it.brand||"").toLowerCase(),
-    _modelo:(it.model||it.modelName||it.modelLine||"").toLowerCase()
+    titulo: (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70),
+    precio: precioDe(it), km: kmDe(it), ano: anoDe(it),
+    portal: portal, color: color,
+    url: it.url || it.listingUrl || (it.web_slug ? "https://es.wallapop.com/item/" + it.web_slug : fallbackUrl),
+    descripcion: [it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
+    imagen: (it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || it.image_url || null,
+    _marca: (it.manufacturer || it.make || it.brand || "").toLowerCase(),
+    _modelo: (it.model || it.modelName || it.modelLine || "").toLowerCase()
   });
 }
 
-function matchModelo(r,mo){
-  if(!mo)return true;
-  var needle=mo.replace(/[\s\-]/g,"");
-  var tit=(r.titulo||"").toLowerCase().replace(/[\s\-]/g,"");
-  var mod=(r._modelo||"").replace(/[\s\-]/g,"");
-  var marc=(r._marca||"").replace(/[\s\-]/g,"");
-  return tit.indexOf(needle)!==-1||mod.indexOf(needle)!==-1||(marc+mod).indexOf(needle)!==-1;
+function matchModelo(r, mo) {
+  if (!mo) return true;
+  var needle = mo.replace(/[\s\-]/g,"");
+  var tit = (r.titulo || "").toLowerCase().replace(/[\s\-]/g,"");
+  var mod = (r._modelo || "").replace(/[\s\-]/g,"");
+  var marc = (r._marca || "").replace(/[\s\-]/g,"");
+  return tit.indexOf(needle) !== -1 || mod.indexOf(needle) !== -1 || (marc + mod).indexOf(needle) !== -1;
 }
 
-function bandera(cc){
-  var f={"españa":"🇪🇸","alemania":"🇩🇪","francia":"🇫🇷","italia":"🇮🇹","países bajos":"🇳🇱","holanda":"🇳🇱","bélgica":"🇧🇪","austria":"🇦🇹","luxemburgo":"🇱🇺","portugal":"🇵🇹","reino unido":"🇬🇧"};
-  return f[(cc||"").toLowerCase()]||"🌍";
+function bandera(cc) {
+  var f = {"espana":"ES","espagna":"ES","alemania":"DE","francia":"FR","italia":"IT","paises bajos":"NL","holanda":"NL","belgica":"BE","austria":"AT","luxemburgo":"LU","portugal":"PT","reino unido":"GB"};
+  var flags = {"ES":"&#127466;&#127480;","DE":"&#127465;&#127466;","FR":"&#127467;&#127479;","IT":"&#127470;&#127481;","NL":"&#127475;&#127473;","BE":"&#127463;&#127466;","AT":"&#127462;&#127481;","LU":"&#127473;&#127482;","PT":"&#127477;&#127481;","GB":"&#127468;&#127463;"};
+  var norm = (cc || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  var code = f[norm];
+  return code ? flags[code] : "&#127757;";
 }
 
-function bAS(){
-  return actor("ivanvs~autoscout-scraper",{urls:[{url:uAS()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    d.slice(0,40).forEach(function(it){
-      var pais=it.countryVersion||"";
-      var badge=pais&&pais.toLowerCase()!=="españa"?"AutoScout24 "+bandera(pais)+" "+pais.toUpperCase():"AutoScout24";
+function bAS() {
+  return actor("ivanvs~autoscout-scraper", {urls:[{url:uAS()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    d.slice(0,40).forEach(function(it) {
+      var pais = it.countryVersion || "";
+      var badge = (pais && pais.toLowerCase() !== "espana" && pais.toLowerCase() !== "españa") ? "AutoScout24 " + bandera(pais) + " " + pais.toUpperCase() : "AutoScout24";
       res.push({
-        titulo:(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70),
-        precio:precioDe(it),km:kmDe(it),ano:anoDe(it),
-        portal:badge,color:"#f47920",
-        url:it.url||it.listingUrl||uAS(),
-        descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),
-        imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||it.image_url||null,
-        _marca:(it.manufacturer||it.make||it.brand||"").toLowerCase(),
-        _modelo:(it.model||it.modelName||it.modelLine||"").toLowerCase()
+        titulo: (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70),
+        precio: precioDe(it), km: kmDe(it), ano: anoDe(it),
+        portal: badge, color: "#f47920",
+        url: it.url || it.listingUrl || uAS(),
+        descripcion: [it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
+        imagen: (it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null,
+        _marca: (it.manufacturer || it.make || it.brand || "").toLowerCase(),
+        _modelo: (it.model || it.modelName || it.modelLine || "").toLowerCase()
       });
     });
-  }).catch(function(e){log("❌ AutoScout24: "+e.message);});
+  }).catch(function(e) { log("Error AutoScout24: " + e.message); });
 }
 
-function bWP(){
-  return actor("fayoussef~wallapop-scraper",{start_urls:[{url:uWP()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    d.slice(0,40).forEach(function(it){
-      var precio=it.price||0;
-      var url=it.listing_url||it.share_url||(it.web_slug?"https://es.wallapop.com/item/"+it.web_slug:uWP());
-      var img=(it.images&&it.images[0])||it.imageUrl||null;
-      var pais=it.country_code||"";
-      var badge=pais&&pais.toUpperCase()!=="ES"?"Wallapop "+bandera(pais)+" "+pais.toUpperCase():"Wallapop";
+function bWP() {
+  return actor("fayoussef~wallapop-scraper", {start_urls:[{url:uWP()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    d.slice(0,40).forEach(function(it) {
+      var url = it.listing_url || it.share_url || (it.web_slug ? "https://es.wallapop.com/item/" + it.web_slug : uWP());
+      var img = (it.images && it.images[0]) || it.imageUrl || null;
       res.push({
-        titulo:(it.title||((it.brand||"")+" "+(it.model||"")).trim()||"Sin título").slice(0,70),
-        precio:pp(precio),km:pp(it.km||0),ano:ay(it.year||0),
-        portal:badge,color:"#13c1ac",url:url,
-        descripcion:[it.engine,it.gear_box,it.body_type].filter(Boolean).join(", ").slice(0,60),
-        imagen:img,_marca:(it.brand||"").toLowerCase(),_modelo:(it.model||"").toLowerCase()
+        titulo: (it.title || ((it.brand || "") + " " + (it.model || "")).trim() || "Sin titulo").slice(0,70),
+        precio: pp(it.price || 0), km: pp(it.km || 0), ano: ay(it.year || 0),
+        portal: "Wallapop", color: "#13c1ac", url: url,
+        descripcion: [it.engine, it.gear_box, it.body_type].filter(Boolean).join(", ").slice(0,60),
+        imagen: img, _marca: (it.brand || "").toLowerCase(), _modelo: (it.model || "").toLowerCase()
       });
     });
-  }).catch(function(e){log("❌ Wallapop: "+e.message);});
+  }).catch(function(e) { log("Error Wallapop: " + e.message); });
 }
 
-function bCN(){
-  var url=uCN();
-  log("🔬 CN url: "+url);
-  return actor("ivanvs~coches-net-scraper",{urls:[{url:url}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    d.slice(0,40).forEach(function(it){push(it,"Coches.net","#1a6fb5",url);});
-  }).catch(function(e){log("❌ Coches.net: "+e.message);});
+function bCN() {
+  var url = uCN();
+  log("Coches.net: " + url);
+  return actor("ivanvs~coches-net-scraper", {urls:[{url:url}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    d.slice(0,40).forEach(function(it) { push(it, "Coches.net", "#1a6fb5", url); });
+  }).catch(function(e) { log("Error Coches.net: " + e.message); });
 }
 
-function bMD(){
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca");
-  if(m&&!MDKEY[m]){log("ℹ️ mobile.de: "+m+" sin ref, omitido");return Promise.resolve();}
-  return actor("ivanvs~mobile-de-scraper",{urls:[{url:uMD()}],maxItems:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    d.slice(0,40).forEach(function(it){
-      var titulo=(it.title||it.shortTitle||((it.manufacturer||it.make||"")+" "+(it.model||"")).trim()||"Sin título").replace(/\s+/g," ").slice(0,70);
-      res.push({titulo:titulo,precio:precioDe(it),km:kmDe(it),ano:anoDe(it),portal:"mobile.de 🇩🇪",color:"#f5a623",url:it.url||it.listingUrl||uMD(),descripcion:[it.fuelType,it.gearbox||it.transmission,it.bodyType].filter(Boolean).join(", ").slice(0,60),imagen:(it.images&&(it.images[0].url||it.images[0]))||it.imageUrl||it.image||null,_marca:(it.manufacturer||it.make||it.brand||titulo).toLowerCase(),_modelo:(it.model||it.modelName||titulo).toLowerCase()});
+function bMD() {
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca");
+  if (m && !MDKEY[m]) { log("mobile.de: " + m + " sin referencia, omitido"); return Promise.resolve(); }
+  return actor("ivanvs~mobile-de-scraper", {urls:[{url:uMD()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    d.slice(0,40).forEach(function(it) {
+      var titulo = (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70);
+      res.push({titulo:titulo, precio:precioDe(it), km:kmDe(it), ano:anoDe(it), portal:"mobile.de", color:"#f5a623", url:it.url || it.listingUrl || uMD(), descripcion:[it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60), imagen:(it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null, _marca:(it.manufacturer || it.make || it.brand || titulo).toLowerCase(), _modelo:(it.model || it.modelName || titulo).toLowerCase()});
     });
-  }).catch(function(e){log("❌ mobile.de: "+e.message);});
+  }).catch(function(e) { log("Error mobile.de: " + e.message); });
 }
 
-function addMila(){
-  var btn=document.getElementById("btnM");
-  btn.disabled=true;btn.textContent="⏳ Milanuncios...";
-  log("🚀 Milanuncios (actor)...");
-  var m=v("selMarca")==="Cualquiera"?"":v("selMarca"),mo=modelo();
-  var kw=(m+" "+mo).trim()||m||"coche";
-  actor("zen-studio~milanuncios-scraper",{text:kw,maxResults:40,proxyConfiguration:{useApifyProxy:true}}).then(function(d){
-    if(d[0])log("🔬 MN[0]: "+JSON.stringify(d[0]).slice(500,1000));
-    var antes=res.length;
-    var needle=kw.toLowerCase().replace(/[\s\-]/g,"");
-    d.slice(0,40).forEach(function(it){
-      var att=it.attributes||{};
-      var titulo=(it.title||it.name||kw||"Sin título").slice(0,70);
-      if(needle&&titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(needle)===-1)return;
-      var url=(it.url||it.listingUrl||"").replace(/^https?:\/\/[^/]*metabuscacoches[^/]*/,"https://www.milanuncios.com");
-      if(!url||url.indexOf("milanuncios")===-1)url=uMN();
-      var img=null;
-      if(it.images&&it.images.length>0)img=it.images[0].url||it.images[0];
-      if(!img)img=it.image||it.imageUrl||null;
+function addMila() {
+  var btn = document.getElementById("btnM");
+  btn.disabled = true; btn.textContent = "Buscando Milanuncios...";
+  var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
+  var kw = (m + " " + mo).trim() || m || "coche";
+  log("Milanuncios: buscando " + kw);
+  actor("zen-studio~milanuncios-scraper", {text:kw, maxResults:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    var antes = res.length;
+    var needle = kw.toLowerCase().replace(/[\s\-]/g,"");
+    d.slice(0,40).forEach(function(it) {
+      var att = it.attributes || {};
+      var titulo = (it.title || it.name || kw || "Sin titulo").slice(0,70);
+      if (needle && titulo.toLowerCase().replace(/[\s\-]/g,"").indexOf(needle) === -1) return;
+      var url = (it.url || it.listingUrl || "").replace(/^https?:\/\/[^\/]*metabuscacoches[^\/]*/,"https://www.milanuncios.com");
+      if (!url || url.indexOf("milanuncios") === -1) url = uMN();
+      var img = null;
+      if (it.images && it.images.length > 0) img = it.images[0].url || it.images[0];
+      if (!img) img = it.image || it.imageUrl || null;
       res.push({
-        titulo:titulo,
-        precio:pp(it.price||it.salePrice||0),
-        km:pp((att.kilometers&&att.kilometers.raw)||it.mileage||it.km||0),
-        ano:ay((att.year&&att.year.raw)||it.year||it.modelYear||0),
-        portal:"Milanuncios",color:"#e67e22",
-        url:url,
-        descripcion:[(att.fuel&&att.fuel.formatted),(att.transmission&&att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
-        imagen:img,
-        _marca:(it.brand||it.make||m||"").toLowerCase(),
-        _modelo:(it.model||titulo).toLowerCase()
+        titulo: titulo,
+        precio: pp(it.price || it.salePrice || 0),
+        km: pp((att.kilometers && att.kilometers.raw) || it.mileage || it.km || 0),
+        ano: ay((att.year && att.year.raw) || it.year || it.modelYear || 0),
+        portal: "Milanuncios", color: "#e67e22", url: url,
+        descripcion: [(att.fuel && att.fuel.formatted), (att.transmission && att.transmission.formatted)].filter(Boolean).join(", ").slice(0,60),
+        imagen: img,
+        _marca: (it.brand || it.make || m || "").toLowerCase(),
+        _modelo: (it.model || titulo).toLowerCase()
       });
     });
-    var n=res.length-antes;
-    log("📦 Milanuncios: "+n+" encontrados");
-    btn.disabled=false;btn.textContent=n>0?"✓ Milanuncios":"➕ Milanuncios";
-    if(n>0)render();
-  }).catch(function(e){
-    log("❌ Milanuncios: "+e.message);
-    btn.disabled=false;btn.textContent="➕ Milanuncios";
+    var n = res.length - antes;
+    log("Milanuncios: " + n + " encontrados");
+    btn.disabled = false; btn.textContent = n > 0 ? "OK Milanuncios" : "+ Milanuncios";
+    if (n > 0) render();
+  }).catch(function(e) {
+    log("Error Milanuncios: " + e.message);
+    btn.disabled = false; btn.textContent = "+ Milanuncios";
   });
 }
 
-function buscar(){
-  res=[];
-  document.getElementById("log").innerHTML="";
-  document.getElementById("lista").innerHTML="";
-  document.getElementById("orden").className="hidden";
-  document.getElementById("lnkP").href=uPark();
-  var estado=document.getElementById("estado");
-  estado.className="empty";
-  estado.innerHTML='<div style="font-size:36px">🔍</div><p style="font-weight:600">Buscando en 4 portales...</p><p style="font-size:12px;color:#a0aec0">30–90 segundos</p>';
-  var btn=document.getElementById("btnB");
-  btn.disabled=true;btn.textContent="⏳ Buscando...";
-  Promise.all([bAS(),bWP(),bCN(),bMD()]).then(function(){
-    btn.disabled=false;btn.textContent="🔎 Buscar";
-    document.getElementById("orden").className="";
-    document.getElementById("btnM").disabled=false;
-    document.getElementById("btnM").textContent="➕ Milanuncios";
-    if(res.length===0){
-      estado.className="empty";
-      estado.innerHTML='<div style="font-size:36px">😕</div><p style="font-weight:600;color:#c53030">Sin resultados. Revisa el log.</p>';
-    }else{estado.className="hidden";render();}
+function buscar() {
+  res = [];
+  document.getElementById("log").innerHTML = "";
+  document.getElementById("lista").innerHTML = "";
+  document.getElementById("orden").className = "hidden";
+  document.getElementById("lnkP").href = uPark();
+  var estado = document.getElementById("estado");
+  estado.className = "empty";
+  estado.innerHTML = '<div style="font-size:36px">&#128270;</div><p style="font-weight:600">Buscando en 4 portales...</p><p style="font-size:12px;color:#a0aec0">30-90 segundos</p>';
+  var btn = document.getElementById("btnB");
+  btn.disabled = true; btn.textContent = "Buscando...";
+  Promise.all([bAS(), bWP(), bCN(), bMD()]).then(function() {
+    btn.disabled = false; btn.textContent = "Buscar";
+    document.getElementById("orden").className = "";
+    document.getElementById("btnM").disabled = false;
+    document.getElementById("btnM").textContent = "+ Milanuncios";
+    if (res.length === 0) {
+      estado.className = "empty";
+      estado.innerHTML = '<div style="font-size:36px">&#128528;</div><p style="font-weight:600;color:#c53030">Sin resultados. Revisa el log.</p>';
+    } else { estado.className = "hidden"; render(); }
   });
 }
 
-function render(){
-  var ord=v("ord"),mo=modelo().toLowerCase(),seen={};
-  var arr=res.filter(function(r){
-    var key=(r.portal.split(" ")[0]+"|"+r.titulo+"|"+r.precio+"|"+r.km+"|"+r.ano).toLowerCase();
-    if(seen[key])return false;seen[key]=true;
-    if(mo&&!matchModelo(r,mo))return false;
+function render() {
+  var ord = v("ord"), mo = modelo().toLowerCase(), seen = {};
+  var arr = res.filter(function(r) {
+    var key = (r.portal.split(" ")[0] + "|" + r.titulo + "|" + r.precio + "|" + r.km + "|" + r.ano).toLowerCase();
+    if (seen[key]) return false; seen[key] = true;
+    if (mo && !matchModelo(r, mo)) return false;
     return true;
-  }).sort(function(a,b){
-    return ord==="p_asc"?a.precio-b.precio:ord==="p_desc"?b.precio-a.precio:ord==="km_asc"?a.km-b.km:b.ano-a.ano;
+  }).sort(function(a,b) {
+    return ord === "p_asc" ? a.precio - b.precio : ord === "p_desc" ? b.precio - a.precio : ord === "km_asc" ? a.km - b.km : b.ano - a.ano;
   });
-  var html="";
-  arr.forEach(function(r){
-    html+='<a class="result" href="'+r.url+'" target="_blank" rel="noreferrer">'
-      +(r.imagen?'<img src="'+r.imagen+'" alt="" onerror="this.style.display=\'none\'">':'')
-      +'<div style="flex:1;padding:10px 12px;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">'
-      +'<div style="flex:1;min-width:0">'
-      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
-      +'<span style="font-weight:700;font-size:14px;color:#1a202c">'+r.titulo+'</span>'
-      +'<span class="badge" style="background:'+r.color+'22;color:'+r.color+'">'+r.portal+'</span></div>'
-      +(r.descripcion?'<p style="font-size:12px;color:#718096;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">'+r.descripcion+'</p>':'')
-      +'<div style="display:flex;gap:10px">'
-      +(r.ano>0?'<span style="font-size:12px;color:#4a5568">📅 '+r.ano+'</span>':'')
-      +(r.km>0?'<span style="font-size:12px;color:#4a5568">🛣️ '+r.km.toLocaleString("es")+'</span>':'')
-      +'</div></div>'
-      +'<div style="text-align:right;flex-shrink:0"><p style="font-size:18px;font-weight:700;color:#2c5282;margin:0">'+(r.precio>0?r.precio.toLocaleString("es")+"€":"—")+'</p>'
-      +'<span style="font-size:11px;color:#a0aec0">Ver →</span></div></div></a>';
+  var html = "";
+  arr.forEach(function(r) {
+    html += '<a class="result" href="' + r.url + '" target="_blank" rel="noreferrer">'
+      + (r.imagen ? '<img src="' + r.imagen + '" alt="" onerror="this.style.display=\'none\'">' : '')
+      + '<div style="flex:1;padding:10px 12px;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
+      + '<span style="font-weight:700;font-size:14px;color:#1a202c">' + r.titulo + '</span>'
+      + '<span class="badge" style="background:' + r.color + '22;color:' + r.color + '">' + r.portal + '</span></div>'
+      + (r.descripcion ? '<p style="font-size:12px;color:#718096;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">' + r.descripcion + '</p>' : '')
+      + '<div style="display:flex;gap:10px">'
+      + (r.ano > 0 ? '<span style="font-size:12px;color:#4a5568">' + r.ano + '</span>' : '')
+      + (r.km > 0 ? '<span style="font-size:12px;color:#4a5568">' + r.km.toLocaleString("es") + ' km</span>' : '')
+      + '</div></div>'
+      + '<div style="text-align:right;flex-shrink:0"><p style="font-size:18px;font-weight:700;color:#2c5282;margin:0">' + (r.precio > 0 ? r.precio.toLocaleString("es") + "&euro;" : "&mdash;") + '</p>'
+      + '<span style="font-size:11px;color:#a0aec0">Ver &rarr;</span></div></div></a>';
   });
-  if(arr.length)html+='<p style="text-align:center;font-size:11px;color:#a0aec0;margin-top:8px">'+arr.length+' resultados</p>';
-  document.getElementById("lista").innerHTML=html;
+  if (arr.length) html += '<p style="text-align:center;font-size:11px;color:#a0aec0;margin-top:8px">' + arr.length + ' resultados</p>';
+  document.getElementById("lista").innerHTML = html;
 }
 
-(function(){
-  document.getElementById("ver").textContent=VER;
+(function() {
+  document.getElementById("ver").textContent = VER;
   cargarMarcas();
 })();
 </script>
