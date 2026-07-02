@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v84";
+var VER = "v85";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -321,7 +321,9 @@ function bCN() {
 
 function bMD() {
   var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca");
-  if (m && !MDKEY[m]) { log("mobile.de: " + m + " sin referencia, omitido"); return Promise.resolve(); }
+  var key = m ? (MDKEY[m] || "") : "";
+  log("🔬 MD marca=" + m + " key=" + key + " url=" + uMD().slice(0,100));
+  if (m && !key) { log("mobile.de: " + m + " sin referencia, omitido"); return Promise.resolve(); }
   return actor("ivanvs~mobile-de-scraper", {urls:[{url:uMD()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
     if(d[0]) log("🔬 MD[0] model=" + d[0].model + " modelName=" + d[0].modelName + " title=" + (d[0].title||"").slice(0,40));
     d.slice(0,40).forEach(function(it) {
