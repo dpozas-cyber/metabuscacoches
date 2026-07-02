@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v82";
+var VER = "v83";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -279,6 +279,7 @@ function bandera(cc) {
 
 function bAS() {
   return actor("ivanvs~autoscout-scraper", {urls:[{url:uAS()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    if(d[0]) log("🔬 AS[0] price=" + JSON.stringify(d[0].price) + " rawPrice=" + d[0].rawPrice + " milage=" + d[0].milage);
     d.slice(0,40).forEach(function(it) {
       var pais = it.countryVersion || "";
       var norm = pais.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
