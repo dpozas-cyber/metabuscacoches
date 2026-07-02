@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v83";
+var VER = "v84";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -242,7 +242,7 @@ function precioDe(it) {
   var p = it.price;
   if (p && typeof p === "object") { p = p.price || p.amount || p.value || p.gross || p.consumerPriceGross || p.raw || 0; }
   var val = p || it.rawPrice || it.priceValue || it.netPrice || 0;
-  if (typeof val === "number") return val > 500 ? Math.round(val) : Math.round(val * 1000);
+  if (typeof val === "number") return Math.round(val);
   return pp(val);
 }
 function kmDe(it) { var k = it.milage || it.mileage || it.km; if (!k && it.attributes) k = it.attributes.km || it.attributes.mileage; return pp(k || 0); }
@@ -279,7 +279,6 @@ function bandera(cc) {
 
 function bAS() {
   return actor("ivanvs~autoscout-scraper", {urls:[{url:uAS()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
-    if(d[0]) log("🔬 AS[0] price=" + JSON.stringify(d[0].price) + " rawPrice=" + d[0].rawPrice + " milage=" + d[0].milage);
     d.slice(0,40).forEach(function(it) {
       var pais = it.countryVersion || "";
       var norm = pais.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
@@ -324,14 +323,19 @@ function bMD() {
   var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca");
   if (m && !MDKEY[m]) { log("mobile.de: " + m + " sin referencia, omitido"); return Promise.resolve(); }
   return actor("ivanvs~mobile-de-scraper", {urls:[{url:uMD()}], maxItems:40, proxyConfiguration:{useApifyProxy:true}}).then(function(d) {
+    if(d[0]) log("🔬 MD[0] model=" + d[0].model + " modelName=" + d[0].modelName + " title=" + (d[0].title||"").slice(0,40));
     d.slice(0,40).forEach(function(it) {
       var titulo = (it.title || it.shortTitle || ((it.manufacturer || it.make || "") + " " + (it.model || "")).trim() || "Sin titulo").replace(/\s+/g," ").slice(0,70);
+      var mo = modelo().toLowerCase();
+      var moNeedle = mo.replace(/[\s\-]/g,"");
+      var titNorm = titulo.toLowerCase().replace(/[\s\-]/g,"");
+      if (moNeedle && titNorm.indexOf(moNeedle) === -1) return;
       res.push({titulo:titulo, precio:precioDe(it), km:kmDe(it), ano:anoDe(it), portal:"mobile.de", color:"#f5a623",
         url:it.url || it.listingUrl || uMD(),
         descripcion:[it.fuelType, it.gearbox || it.transmission, it.bodyType].filter(Boolean).join(", ").slice(0,60),
         imagen:(it.images && (it.images[0].url || it.images[0])) || it.imageUrl || it.image || null,
         _marca:(it.manufacturer || it.make || it.brand || titulo).toLowerCase(),
-        _modelo:(it.model || it.modelName || titulo).toLowerCase()});
+        _modelo:titulo.toLowerCase()});
     });
   }).catch(function(e) { log("Error mobile.de: " + e.message); });
 }
