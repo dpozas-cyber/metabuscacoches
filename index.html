@@ -75,7 +75,7 @@ h1{font-size:19px;font-weight:700}
 </div>
 <script>
 "use strict";
-var VER = "v81";
+var VER = "v82";
 var TOKEN = "apify_api_5Ur3CCJHzYZfpZojUk4nAaNsOGbYLk2kUuPG";
 var PROXY = "https://metabuscador.dpozas.workers.dev";
 var res = [];
@@ -148,7 +148,6 @@ function cargarMarcas() {
 function uAS() {
   var m = v("selMarca") === "Cualquiera" ? "" : v("selMarca"), mo = modelo();
   var europa = document.getElementById("chkEuropa").checked;
-  var base = europa ? "https://www.autoscout24.com" : "https://www.autoscout24.es";
   var cy = europa ? "D,A,B,E,F,I,L,NL" : "E";
   var q = "atype=C&ustate=N,U&cy=" + cy + "&sort=price&desc=0&damaged_listing=exclude";
   if (v("pMin")) q += "&pricefrom=" + v("pMin");
@@ -156,7 +155,7 @@ function uAS() {
   if (v("aMin")) q += "&fregfrom=" + v("aMin");
   if (v("aMax")) q += "&fregto=" + v("aMax");
   if (v("kmMax")) q += "&kmto=" + v("kmMax");
-  return base + (m ? "/lst/" + slug(m) + (mo ? "/" + slug(mo) : "") : "/lst") + "?" + q;
+  return "https://www.autoscout24.es" + (m ? "/lst/" + slug(m) + (mo ? "/" + slug(mo) : "") : "/lst") + "?" + q;
 }
 
 function uWP() {
